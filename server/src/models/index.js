@@ -22,18 +22,58 @@ export const User = model('User', UserSchema);
 
 // ---------- FACILITIES ----------
 export const Facility = model('Facility', new Schema({
-  slug:           { type: String, unique: true, required: true },
-  name:           { type: String, required: true },
-  addressLine1:   String,
-  addressLine2:   String,
-  city:           String,
-  state:          String,
-  postalCode:     String,
-  capacity:       { type: Number, default: 0 },
-  licenseNumber:  String,
-  licenseExpires: Date,
-  phone:          String,
-  isActive:       { type: Boolean, default: true },
+  slug: {
+    type: String,
+    unique: true,
+    required: true
+  },
+
+  name: {
+    type: String,
+    required: true
+  },
+
+  type: {
+    type: String,
+    default: 'FFA'
+  },
+
+  // ADDRESS
+  addressLine1: String,
+  addressLine2: String,
+  city: String,
+  state: String,
+  postalCode: String,
+
+  // CONTACT
+  phone: String,
+  email: String,
+
+  // LICENSE
+  licenseNumber: String,
+  licenseIssueDate: Date,
+  licenseExpiryDate: Date,
+
+  // FACILITY INFO
+  capacity: {
+    type: Number,
+    default: 0
+  },
+
+  manager: String,
+
+  populationServed: String,
+
+  specializations: [String],
+
+  notes: String,
+
+  // STATUS
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+
 }, opts));
 
 // ---------- STAFF ----------
@@ -59,23 +99,126 @@ export const Guardian = model('Guardian', new Schema({
 }, opts));
 
 // ---------- RESIDENTS ----------
+// ---------- RESIDENTS ----------
 export const Resident = model('Resident', new Schema({
-  facility:        { ...ref('Facility'), required: true },
-  firstName:       { type: String, required: true },
-  lastName:        { type: String, required: true },
-  preferredName:   String,
-  dateOfBirth:     { type: Date, required: true },
-  gender:          String,
-  pronouns:        String,
-  admissionDate:   { type: Date, default: Date.now },
-  dischargeDate:   Date,
-  roomNumber:      String,
-  riskLevel:       { type: String, enum: ['low','medium','high'], default: 'low' },
-  primaryDiagnosis:String,
-  allergies:       String,
-  photoUrl:        String,
-  guardians:       [{ guardian: ref('Guardian'), isPrimary: Boolean }],
-  isActive:        { type: Boolean, default: true },
+
+  // FACILITY
+  facility: {
+    ...ref('Facility'),
+    required: true
+  },
+
+  // BASIC INFO
+  firstName: {
+    type: String,
+    required: true
+  },
+
+  lastName: {
+    type: String,
+    required: true
+  },
+
+  preferredName: String,
+
+  dateOfBirth: {
+    type: Date,
+    required: true
+  },
+
+  gender: String,
+  pronouns: String,
+
+  ethnicity: String,
+  primaryLanguage: String,
+
+  // REFERRAL
+  referringAgency: String,
+  referralWorker: String,
+  placementReason: String,
+
+  // PLACEMENT
+  admissionDate: {
+    type: Date,
+    default: Date.now
+  },
+
+  placementDate: Date,
+
+  dischargeDate: Date,
+
+  roomNumber: String,
+
+  placementType: String,
+
+  legalStatus: String,
+
+  permanencyGoal: String,
+
+  caseNumber: String,
+
+  school: String,
+
+  // RISK / HEALTH
+  riskLevel: {
+    type: String,
+    enum: ['low', 'moderate', 'high'],
+    default: 'low'
+  },
+
+  primaryDiagnosis: String,
+
+  diagnoses: String,
+
+  medications: String,
+
+  physician: String,
+
+  psychotropicMedications: String,
+
+  allergies: String,
+
+  safetyConcerns: String,
+
+  priorPlacements: String,
+
+  traumaHistory: String,
+
+  photoUrl: String,
+
+  // TEAM
+  caseworker: String,
+
+  supervisor: String,
+
+  therapist: String,
+
+  casaVolunteer: String,
+
+  countyWorker: String,
+
+  // GUARDIAN
+  guardianName: String,
+
+  guardianPhone: String,
+
+  guardianRestrictions: String,
+
+  emergencyContact: String,
+
+  restrictedIndividuals: String,
+
+  guardians: [{
+    guardian: ref('Guardian'),
+    isPrimary: Boolean
+  }],
+
+  // STATUS
+  isActive: {
+    type: Boolean,
+    default: true
+  }
+
 }, opts));
 
 // ---------- APPOINTMENTS ----------
