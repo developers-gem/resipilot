@@ -13,7 +13,7 @@ export default function Handoff() {
       <div className="table-wrap">
         <table>
           <thead><tr><th>Facility</th><th>Shift</th><th>Start</th><th>End</th><th>Handoff note</th><th></th></tr></thead>
-          <tbody>
+            <tbody>
             {items.length === 0 && <tr><td colSpan="6" className="muted">No shifts logged.</td></tr>}
             {items.map(s => (
               <tr key={s._id}>
@@ -37,7 +37,19 @@ function NewShift({ facilities, onSave, onClose }) {
   return (
     <Modal title="Log shift handoff" onClose={onClose} footer={
       <><button className="btn" onClick={onClose}>Cancel</button>
-        <button className="btn primary" onClick={() => onSave(d)}>Save</button></>
+<button
+  className="btn primary"
+  onClick={() => {
+    if (!d.startsAt || !d.endsAt) {
+      alert('Please select start and end time');
+      return;
+    }
+
+    onSave(d);
+  }}
+>
+  Save
+</button></>
     }>
       <Field label="Facility"><select value={d.facility} onChange={e => setD({ ...d, facility: e.target.value })}>
         {facilities.map(f => <option key={f._id} value={f._id}>{f.name}</option>)}

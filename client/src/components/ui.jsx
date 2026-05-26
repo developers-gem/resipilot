@@ -25,12 +25,40 @@ export function useResource(path) {
 export function Modal({ title, onClose, children, footer }) {
   return (
     <div className="modal-bg" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
+      <div
+        className="modal"
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: '95vw',
+          maxWidth: '1000px',
+          height: '80vh',
+          maxHeight: '94vh',
+          background: '#fff',
+          borderRadius: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
+      >
         <div className="modal-head">
           <h2>{title}</h2>
-          <button className="btn ghost sm" onClick={onClose}><i className="ti ti-x" /></button>
+
+          <button className="btn ghost sm" onClick={onClose}>
+            <i className="ti ti-x" />
+          </button>
         </div>
-        <div className="modal-body">{children}</div>
+
+        <div
+          className="modal-body"
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            paddingRight: 4
+          }}
+        >
+          {children}
+        </div>
+
         {footer && <div className="modal-foot">{footer}</div>}
       </div>
     </div>
