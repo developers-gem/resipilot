@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import authRoutes from './routes/auth.js';
 import { crudRouter } from './routes/crud.js';
 import * as Models from './models/index.js';
+import certificationRoutes from './routes/certifications.js';
 
 const app = express();
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
@@ -33,7 +34,7 @@ const resourceMap = {
   'bip-plans':             Models.BipPlan,
   'shifts':                Models.Shift,
   'licensing':             Models.LicensingRecord,
-  'certifications':        Models.StaffCertification,
+  // 'certifications':        Models.StaffCertification,
   'training-courses':      Models.TrainingCourse,
   'outcome-metrics':       Models.OutcomeMetric,
   'audit':                 Models.AuditLog,
@@ -42,7 +43,13 @@ const resourceMap = {
 
 for (const [path, Model] of Object.entries(resourceMap)) {
   app.use(`/api/${path}`, crudRouter(Model));
+  
 }
+
+
+
+// Custom populated certifications routes
+app.use('/api/certifications', certificationRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

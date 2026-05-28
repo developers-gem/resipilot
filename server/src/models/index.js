@@ -353,19 +353,75 @@ export const OutcomeMetric = model('OutcomeMetric', new Schema({
 }, opts));
 
 // ---------- DOCUMENTS ----------
+// export const Document = model('Document', new Schema({
+//   resident:       ref('Resident'),
+//   facility:       ref('Facility'),
+//   uploadedBy:     ref('User'),
+//   category:       { type: String, enum: ['legal','medical','education','consent','licensing','other'], default: 'other' },
+//   title:          { type: String, required: true },
+//   description:    String,
+//   fileUrl:        { type: String, required: true },
+//   fileSizeBytes:  Number,
+//   mimeType:       String,
+//   isConfidential: { type: Boolean, default: true },
+//   expiresOn:      Date,
+// }, opts));
+
+// ---------- DOCUMENTS ----------
 export const Document = model('Document', new Schema({
   resident:       ref('Resident'),
   facility:       ref('Facility'),
   uploadedBy:     ref('User'),
-  category:       { type: String, enum: ['legal','medical','education','consent','licensing','other'], default: 'other' },
+
+  category: {
+    type: String,
+    enum: [
+      'legal',
+      'medical',
+      'education',
+      'consent',
+      'licensing',
+      'other'
+    ],
+    default: 'other'
+  },
+
   title:          { type: String, required: true },
   description:    String,
+
   fileUrl:        { type: String, required: true },
+
   fileSizeBytes:  Number,
   mimeType:       String,
-  isConfidential: { type: Boolean, default: true },
+
+  isConfidential: {
+    type: Boolean,
+    default: true
+  },
+
   expiresOn:      Date,
+
+  // ADD THESE ↓↓↓
+
+  status: {
+    type: String,
+    enum: [
+      'Awaiting',
+      'Signed',
+      'In progress'
+    ],
+    default: 'Awaiting'
+  },
+
+  signatureProvider: String,
+
+  retentionYears: {
+    type: Number,
+    default: 7
+  },
+
 }, opts));
+
 
 // ---------- TRAINING / CERTS ----------
 export const TrainingCourse = model('TrainingCourse', new Schema({
