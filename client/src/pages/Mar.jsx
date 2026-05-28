@@ -13,26 +13,181 @@ export default function Mar() {
       } />
       <h3 className="section-title">Active medications</h3>
       <div className="table-wrap">
-        <table>
-          <thead><tr><th>Resident</th><th>Name</th><th>Dosage</th><th>Frequency</th><th>PRN</th><th></th></tr></thead>
-          <tbody>
-            {meds.items.length === 0 && <tr><td colSpan="6" className="muted">No medications.</td></tr>}
-            {meds.items.map(m => (
-              <tr key={m._id}>
-                <td>{residents.find(r => r._id === m.resident)?.firstName || '—'}</td>
-                <td>{m.name}</td>
-                <td>{m.dosage}</td>
-                <td>{m.frequency}</td>
-                <td>{m.isPrn ? <span className="badge purple">PRN</span> : ''}</td>
-                <td><button className="btn sm ghost" onClick={() => meds.remove(m._id)}><i className="ti ti-trash" /></button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16
+  }}
+>
+  {meds.items.length === 0 && (
+    <div className="empty">
+      No medications.
+    </div>
+  )}
+
+  {meds.items.map(m => {
+    const resident = residents.find(
+      r => r._id === m.resident
+    );
+
+    return (
+      <div
+        key={m._id}
+        style={{
+          background: '#fff',
+          border: '1px solid var(--bdr)',
+          borderRadius: 18,
+          overflow: 'hidden',
+          boxShadow:
+            '0 2px 10px rgba(0,0,0,0.04)'
+        }}
+      >
+        {/* TOP */}
+        <div
+          style={{
+            padding: 18,
+            borderBottom: '1px solid var(--bdr)'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'start'
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 24,
+                  fontWeight: 700,
+                  marginBottom: 6
+                }}
+              >
+                {resident?.firstName}{' '}
+                {resident?.lastName}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 18,
+                  fontWeight: 600
+                }}
+              >
+                {m.name}
+              </div>
+
+              <div
+                style={{
+                  color: 'var(--tx3)',
+                  marginTop: 6,
+                  fontSize: 14
+                }}
+              >
+                {m.dosage} · {m.frequency}
+              </div>
+            </div>
+
+            <button
+              className="btn sm ghost"
+              onClick={() => meds.remove(m._id)}
+            >
+              <i className="ti ti-trash" />
+            </button>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              gap: 10,
+              flexWrap: 'wrap',
+              marginTop: 16
+            }}
+          >
+            <span className="badge green">
+              Active
+            </span>
+
+            {m.isPrn && (
+              <span className="badge purple">
+                PRN
+              </span>
+            )}
+
+            <span className="badge blue">
+              MAR ready
+            </span>
+          </div>
+        </div>
+
+        {/* ACTIONS */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              'repeat(3, 1fr)'
+          }}
+        >
+          <button
+            style={{
+              border: 'none',
+              background: '#f0fdf4',
+              padding: 18,
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer',
+              borderRight:
+                '1px solid var(--bdr)'
+            }}
+          >
+            ✓ Given
+          </button>
+
+          <button
+            style={{
+              border: 'none',
+              background: '#fef2f2',
+              padding: 18,
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer',
+              borderRight:
+                '1px solid var(--bdr)'
+            }}
+          >
+            ✕ Refused
+          </button>
+
+          <button
+            style={{
+              border: 'none',
+              background: '#fff',
+              padding: 18,
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer'
+            }}
+          >
+            Other
+          </button>
+        </div>
+      </div>
+    );
+  })}
+</div>
       </div>
 
-      <h3 className="section-title">Recent MAR entries</h3>
-      <div className="table-wrap">
+<div
+  style={{
+    fontSize: 24,
+    fontWeight: 700,
+    marginTop: 34,
+    marginBottom: 14
+  }}
+>
+  MAR log — today
+</div>      <div className="table-wrap">
         <table>
           <thead><tr><th>Scheduled</th><th>Status</th><th>Note</th></tr></thead>
           <tbody>

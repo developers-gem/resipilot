@@ -80,8 +80,19 @@ function AddFacility({ onSave, onClose }) {
             Cancel
           </button>
 
-          <button className="btn primary" onClick={() => onSave(d)}>
-            <i className="ti ti-building-community" />
+          <button
+            className="btn primary"
+            onClick={() =>
+              onSave({
+                ...d,
+                slug: d.name
+                  .toLowerCase()
+                  .trim()
+                  .replace(/\s+/g, '-')
+                  .replace(/[^\w-]+/g, '')
+              })
+            }
+          >            <i className="ti ti-building-community" />
             Create facility
           </button>
         </>
@@ -101,26 +112,26 @@ function AddFacility({ onSave, onClose }) {
             value={d.type}
             onChange={e => setD({ ...d, type: e.target.value })}
           >
-                        <option value="STRTP">Group Home (Licensed) — RCFE/GH
-</option>
+            <option value="STRTP">Group Home (Licensed) — RCFE/GH
+            </option>
 
             <option value="FFA">Foster family agency (FFA)</option>
             <option value="STRTP">Short-Term Residential Therapeutic Program (STRTP)
-</option>
-                        <option value="STRTP">Transitional Housing Program (THP-NMD)
-</option>
+            </option>
+            <option value="STRTP">Transitional Housing Program (THP-NMD)
+            </option>
 
             <option value="STRTP">Emergency Shelter
-</option>
+            </option>
 
             <option value="STRTP">Satellite Facility
-</option>
+            </option>
 
           </select>
         </Field>
       </div>
 
-     
+
 
       <Field label="Street address">
         <input

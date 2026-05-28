@@ -43,90 +43,268 @@ export default function Residents() {
         }
       />
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>DOB</th>
-              <th>Risk</th>
-              <th>Room</th>
-              <th>Facility</th>
-              <th>Status</th>
-              <th></th>
-            </tr>
-          </thead>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 14
+        }}
+      >
+        {facilities.map(facility => {
+          const residents = filtered.filter(
+            r => r.facility === facility._id
+          );
 
-          <tbody>
-            {loading && (
-              <tr>
-                <td colSpan="7" className="muted">
-                  Loading…
-                </td>
-              </tr>
-            )}
+          if (residents.length === 0) return null;
 
-            {!loading && filtered.length === 0 && (
-              <tr>
-                <td colSpan="7" className="muted">
-                  No residents yet.
-                </td>
-              </tr>
-            )}
-
-            {filtered.map(r => (
-              <tr key={r._id}>
-                <td>
-                  <Link
-                    to={`/residents/${r._id}`}
-                    style={{ color: 'var(--blue)' }}
+          return (
+            <div
+              key={facility._id}
+              style={{
+                background: '#fff',
+                border: '1px solid var(--bdr)',
+                borderRadius: 18,
+                padding: 12
+              }}
+            >
+              {/* FACILITY HEADER */}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 18
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 12,
+                      background: '#edf4ff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#1f5eff'
+                    }}
                   >
-                    {r.firstName} {r.lastName}
-                  </Link>
-                </td>
+                    <i className="ti ti-home" />
+                  </div>
 
-                <td>{r.dateOfBirth?.slice(0, 10)}</td>
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 700
+                      }}
+                    >
+                      {facility.name}
+                    </div>
 
-                <td>
-                  <span
-                    className={`badge ${
-                      r.riskLevel === 'high'
-                        ? 'red'
-                        : r.riskLevel === 'moderate'
-                        ? 'amber'
-                        : 'green'
-                    }`}
+                    <div
+                      style={{
+                        color: 'var(--tx3)',
+                        fontSize: 13,
+                        marginTop: 3
+                      }}
+                    >
+                      {residents.length} residents ·{' '}
+                      {facility.capacity || 0} bed capacity
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    background: '#eef5ff',
+                    color: '#1f5eff',
+                    padding: '8px 14px',
+                    borderRadius: 999,
+                    fontSize: 13,
+                    fontWeight: 600
+                  }}
+                >
+                  {facility.manager || 'No manager'}
+                </div>
+              </div>
+
+              {/* RESIDENT CARDS */}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns:
+                    'repeat(auto-fill, minmax(180px, 1fr))',
+                  gap: 10
+                }}
+              >
+                {residents.map(r => (
+                  <div
+                    key={r._id}
+                    style={{
+                      background: '#fff',
+                      border:
+                        r.riskLevel === 'high'
+                          ? '2px solid #ef4444'
+                          : r.riskLevel === 'moderate'
+                            ? '2px solid #f59e0b'
+                            : '2px solid #22c55e',
+                      borderRadius: 18,
+                      padding: 4,
+                      position: 'relative',
+                      boxShadow:
+                        '0 2px 8px rgba(0,0,0,0.04)'
+                    }}
                   >
-                    {r.riskLevel}
-                  </span>
-                </td>
+                    <button
+                      className="btn sm ghost"
+                      onClick={() => remove(r._id)}
+                      style={{
+                        position: 'absolute',
+                        top: 10,
+                        right: 10
+                      }}
+                    >
+                      <i className="ti ti-trash" />
+                    </button>
 
-                <td>{r.roomNumber || '—'}</td>
+                    {/* AVATAR */}
+                    <div
+                      style={{
+                        width: 42,
+                        height: 42,
+                        borderRadius: '50%',
+                        background:
+                          r.riskLevel === 'high'
+                            ? '#fee2e2'
+                            : r.riskLevel === 'moderate'
+                              ? '#fef3c7'
+                              : '#dcfce7',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: 18,
+                        marginBottom: 14
+                      }}
+                    >
+                      {r.firstName?.[0]}
+                      {r.lastName?.[0]}
+                    </div>
 
-                <td>
-                  {facilities.find(f => f._id === r.facility)?.name || '—'}
-                </td>
+                    {/* NAME */}
+                    <Link
+                      to={`/residents/${r._id}`}
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 700,
+                        color: '#111',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      {r.firstName} {r.lastName}
+                    </Link>
 
-                <td>
-                  {r.isActive ? (
-                    <span className="badge green">active</span>
-                  ) : (
-                    <span className="badge gray">inactive</span>
-                  )}
-                </td>
+                    <div
+                      style={{
+                        color: 'var(--tx3)',
+                        marginTop: 6,
+                        fontSize: 14
+                      }}
+                    >
+                      DOB: {r.dateOfBirth?.slice(0, 10)}
+                    </div>
 
-                <td>
-                  <button
-                    className="btn sm ghost"
-                    onClick={() => remove(r._id)}
-                  >
-                    <i className="ti ti-trash" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    {/* STATS */}
+                    <div
+                      style={{
+                        marginTop: 18,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                        fontSize: 14
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <span style={{ color: 'var(--tx3)' }}>
+                          Room
+                        </span>
+
+                        <strong>{r.roomNumber || '—'}</strong>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <span style={{ color: 'var(--tx3)' }}>
+                          Risk
+                        </span>
+
+                        <strong>
+                          {r.riskLevel}
+                        </strong>
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between'
+                        }}
+                      >
+                        <span style={{ color: 'var(--tx3)' }}>
+                          Status
+                        </span>
+
+                        <strong>
+                          {r.isActive ? 'Active' : 'Inactive'}
+                        </strong>
+                      </div>
+                    </div>
+
+                    {/* BADGES */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        gap: 8,
+                        flexWrap: 'wrap',
+                        marginTop: 18
+                      }}
+                    >
+                      <span
+                        className={`badge ${r.riskLevel === 'high'
+                            ? 'red'
+                            : r.riskLevel === 'moderate'
+                              ? 'amber'
+                              : 'green'
+                          }`}
+                      >
+                        {r.riskLevel} risk
+                      </span>
+
+                      <span className="badge blue">
+                        Intake
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {showAdd && (
@@ -233,7 +411,7 @@ function AddResidentModal({ facilities, onSave, onClose }) {
           marginBottom: 24,
           fontSize: 13,
           fontWeight: 600
-          
+
         }}
       >
         <span className={step >= 1 ? 'text-blue' : ''}>1 · Basic info</span>
@@ -265,22 +443,22 @@ function AddResidentModal({ facilities, onSave, onClose }) {
               />
             </Field>
           </div>
-<Field label="Preferred name">
-  <input
-    value={d.preferredName}
-    onChange={e =>
-      setD({ ...d, preferredName: e.target.value })
-    }
-  />
-</Field>
-<Field label="Pronouns">
-  <input
-    value={d.pronouns}
-    onChange={e =>
-      setD({ ...d, pronouns: e.target.value })
-    }
-  />
-</Field>
+          <Field label="Preferred name">
+            <input
+              value={d.preferredName}
+              onChange={e =>
+                setD({ ...d, preferredName: e.target.value })
+              }
+            />
+          </Field>
+          <Field label="Pronouns">
+            <input
+              value={d.pronouns}
+              onChange={e =>
+                setD({ ...d, pronouns: e.target.value })
+              }
+            />
+          </Field>
           <div className="grid cols-2">
             <Field label="Date of birth">
               <input
