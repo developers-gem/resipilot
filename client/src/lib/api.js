@@ -11,9 +11,15 @@ async function request(method, path, body) {
     method,
     headers: {
       'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {}),
     },
-    body: body ? JSON.stringify(body) : undefined,
+    body: body
+      ? JSON.stringify(body)
+      : undefined,
   });
 
   if (!res.ok) {
@@ -21,15 +27,55 @@ async function request(method, path, body) {
       error: res.statusText,
     }));
 
-    throw new Error(err.error || 'Request failed');
+    throw new Error(
+      err.error || 'Request failed'
+    );
+  }
+
+  return res.json();
+}
+
+// NEW
+async function upload(
+  path,
+  formData
+) {
+  const res = await fetch(
+    `${API_BASE}${path}`,
+    {
+      method: 'POST',
+      headers: {
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
+      },
+      body: formData,
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({
+      error: res.statusText,
+    }));
+
+    throw new Error(
+      err.error || 'Upload failed'
+    );
   }
 
   return res.json();
 }
 
 export const api = {
-  get: (p) => request('GET', p),
-  post: (p, b) => request('POST', p, b),
-  patch: (p, b) => request('PATCH', p, b),
-  delete: (p) => request('DELETE', p),
+  get: p => request('GET', p),
+  post: (p, b) =>
+    request('POST', p, b),
+  patch: (p, b) =>
+    request('PATCH', p, b),
+  delete: p =>
+    request('DELETE', p),
+
+  upload,
 };

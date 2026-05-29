@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { api } from '../lib/api.js';
 import {
   useResource,
   PageHeader,
@@ -9,17 +10,24 @@ import {
 
 export default function Documents() {
   const docs = useResource('/documents');
-
+  const residents = useResource('/residents');
   const [open, setOpen] = useState(false);
 
   const [tab, setTab] = useState('all');
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewDoc, setPreviewDoc] = useState(null);
+
   const [form, setForm] = useState({
     title: '',
-    category: 'Legal',
+    category: 'consent',
     resident: '',
-    fileUrl: '',
-    isConfidential: false,
+    description: '',
+    documentDate: new Date()
+      .toISOString()
+      .slice(0, 10),
+    requiresESign: 'none',
+    isConfidential: true,
   });
 
   // ===== SUMMARY =====
@@ -38,9 +46,9 @@ export default function Documents() {
 
       return (
         created.getMonth() ===
-          now.getMonth() &&
+        now.getMonth() &&
         created.getFullYear() ===
-          now.getFullYear()
+        now.getFullYear()
       );
     });
   }, [docs.items]);
@@ -66,22 +74,29 @@ export default function Documents() {
   // ===== CREATE =====
 
   async function uploadDoc() {
-    await docs.create({
-      ...form,
-      status: 'Awaiting',
-    });
+    console.log(form);
+    console.log(selectedFile);
 
-    setOpen(false);
+    const fd = new FormData();
 
-    setForm({
-      title: '',
-      category: 'Legal',
-      resident: '',
-      fileUrl: '',
-      isConfidential: false,
-    });
+    fd.append('title', form.title);
+    fd.append('resident', form.resident);
+    fd.append('category', form.category);
+    fd.append('description', form.description);
+    fd.append('documentDate', form.documentDate);
+    fd.append('requiresESign', form.requiresESign);
+    fd.append('isConfidential', form.isConfidential);
+
+    if (selectedFile) {
+      fd.append('file', selectedFile);
+    }
+
+    const res = await api.upload('/documents', fd);
+
+    console.log(res);
 
     docs.refresh();
+    setOpen(false);
   }
 
   function badge(status) {
@@ -109,6 +124,7 @@ export default function Documents() {
       );
     }
 
+    
     return (
       <span className="badge gray">
         {status || 'Document'}
@@ -390,8 +406,8 @@ export default function Documents() {
                         ? '#FEF3C7'
                         : d.status ===
                           'Signed'
-                        ? '#DCFCE7'
-                        : '#E0E7FF',
+                          ? '#DCFCE7'
+                          : '#E0E7FF',
                     display: 'grid',
                     placeItems: 'center',
                   }}
@@ -410,17 +426,20 @@ export default function Documents() {
 
                   <div
                     style={{
-                      color:
-                        'var(--tx3)',
+                      color: '#8B8B8B',
                       fontSize: 13,
-                      marginTop: 3,
+                      marginTop: 4,
                     }}
                   >
-                    {new Date(
-                      d.createdAt
-                    ).toLocaleDateString()}
+                    {d.resident
+                      ? `${d.resident.firstName} ${d.resident.lastName}`
+                      : 'Unknown Resident'}
+
                     {' • '}
-                    {d.category}
+
+                    {d.requiresESign === 'none'
+                      ? 'Informational only'
+                      : 'Awaiting signature'}
                   </div>
                 </div>
               </div>
@@ -434,8 +453,12 @@ export default function Documents() {
               >
                 {badge(d.status)}
 
-                <button className="btn ghost sm">
+                <button
+                  className="btn ghost sm"
+                  onClick={() => setPreviewDoc(d)}
+                >
                   View
+
                 </button>
 
                 <button
@@ -480,13 +503,14 @@ export default function Documents() {
                 gridColumn: '1/-1',
               }}
             >
-              <Field label="Document title">
+              <Field label="Document date">
                 <input
-                  value={form.title}
+                  type="date"
+                  value={form.documentDate}
                   onChange={e =>
                     setForm({
                       ...form,
-                      title:
+                      documentDate:
                         e.target.value,
                     })
                   }
@@ -494,46 +518,65 @@ export default function Documents() {
               </Field>
             </div>
 
-            <Field label="Category">
+            <Field label="Document type">
               <select
                 value={form.category}
                 onChange={e =>
                   setForm({
                     ...form,
-                    category:
-                      e.target.value,
+                    category: e.target.value,
                   })
                 }
               >
-                <option>
-                  Legal
+                <option value="consent">
+                  Consent form
                 </option>
 
-                <option>
-                  Medical
+                <option value="medical">
+                  Medical record
                 </option>
 
-                <option>
-                  Court
+                <option value="legal">
+                  Court order
                 </option>
 
-                <option>
-                  Consent
+                <option value="education">
+                  Education plan
+                </option>
+
+                <option value="licensing">
+                  Licensing
+                </option>
+
+                <option value="other">
+                  Other
                 </option>
               </select>
             </Field>
 
             <Field label="Resident">
-              <input
+              <select
                 value={form.resident}
                 onChange={e =>
                   setForm({
                     ...form,
-                    resident:
-                      e.target.value,
+                    resident: e.target.value,
                   })
                 }
-              />
+              >
+                <option value="">
+                  Select resident
+                </option>
+
+                {residents.items.map(r => (
+                  <option
+                    key={r._id}
+                    value={r._id}
+                  >
+                    {r.firstName} {r.lastName}
+                  </option>
+                ))}
+              </select>
             </Field>
 
             <div
@@ -541,18 +584,53 @@ export default function Documents() {
                 gridColumn: '1/-1',
               }}
             >
-              <Field label="File URL">
-                <input
-                  value={form.fileUrl}
+
+
+              <Field label="Requires e-signature">
+                <select
+                  value={form.requiresESign}
                   onChange={e =>
                     setForm({
                       ...form,
-                      fileUrl:
+                      requiresESign:
+                        e.target.value,
+                    })
+                  }
+                >
+                  <option value="none">
+                    No
+                  </option>
+
+                  <option value="guardian">
+                    Guardian signature
+                  </option>
+
+                  <option value="court">
+                    Court signature
+                  </option>
+
+                  <option value="staff">
+                    Staff acknowledgement
+                  </option>
+                </select>
+              </Field>
+
+
+              <Field label="Description">
+                <textarea
+                  rows={4}
+                  value={form.description}
+                  onChange={e =>
+                    setForm({
+                      ...form,
+                      description:
                         e.target.value,
                     })
                   }
                 />
               </Field>
+
+
             </div>
 
             <div
@@ -591,23 +669,84 @@ export default function Documents() {
                 gridColumn: '1/-1',
               }}
             >
-              <div
-                style={{
-                  border:
-                    '2px dashed #d1d5db',
-                  borderRadius: 14,
-                  padding: 30,
-                  textAlign: 'center',
-                  color: '#666',
-                }}
-              >
-                Click to upload or drag
-                & drop
-              </div>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                onChange={e =>
+                  setSelectedFile(
+                    e.target.files?.[0]
+                  )
+                }
+              />
+
+              {selectedFile && (
+                <div
+                  style={{
+                    marginTop: 10,
+                    fontSize: 13,
+                  }}
+                >
+                  Selected:
+                  {' '}
+                  {selectedFile.name}
+                </div>
+              )}
             </div>
+          </div>
+
+
+
+        </Modal>
+
+      )}
+
+      {previewDoc && (
+        <Modal
+          title={previewDoc.title || 'Document Preview'}
+          onClose={() => setPreviewDoc(null)}
+        >
+          <div
+            style={{
+              height: '75vh',
+            }}
+          >
+            <iframe
+              src={previewDoc.fileUrl}
+              title="Document Preview"
+              width="100%"
+              height="100%"
+              style={{
+                border: 'none',
+                borderRadius: 12,
+              }}
+            />
           </div>
         </Modal>
       )}
+
+      {previewDoc && (
+  <Modal
+    title={previewDoc.title}
+    onClose={() => setPreviewDoc(null)}
+  >
+    <div
+      style={{
+        height: '80vh',
+      }}
+    >
+      <iframe
+        src={`http://localhost:5000${previewDoc.fileUrl}`}
+        title="Document Preview"
+        width="100%"
+        height="100%"
+        style={{
+          border: 'none',
+          borderRadius: 12,
+        }}
+      />
+    </div>
+  </Modal>
+)}
     </>
   );
 }

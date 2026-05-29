@@ -12,7 +12,7 @@ export default function Training() {
   const staff = useResource('/staff');
 
   const [open, setOpen] = useState(false);
-
+const [file, setFile] = useState(null);
   const [form, setForm] = useState({
     staff: '',
     course: '',
@@ -373,14 +373,12 @@ export default function Training() {
               return (
                 <tr key={row.staff._id}>
                   <td
-                    style={{
-                      fontWeight: 600,
-                    }}
-                  >
-                    {row.staff.fullName ||
-                      row.staff.employeeId ||
-                      'Staff'}
-                  </td>
+  style={{
+    fontWeight: 600,
+  }}
+>
+  {row.staff.fullName || row.staff.employeeId}
+</td>
 
                   <td>
                     <span className="badge blue">
@@ -398,13 +396,12 @@ export default function Training() {
 
                   <td>
                     <span
-                      className={`badge ${
-                        percent === 100
+                      className={`badge ${percent === 100
                           ? 'green'
                           : percent >= 75
-                          ? 'amber'
-                          : 'red'
-                      }`}
+                            ? 'amber'
+                            : 'red'
+                        }`}
                     >
                       {percent}%
                     </span>
@@ -487,19 +484,31 @@ export default function Training() {
                   }
                 >
                   <option value="">
-                    Select course
+                    Select certification
                   </option>
 
-                  {courses.items.map(c => (
+                  {courses.items.map(course => (
                     <option
-                      key={c._id}
-                      value={c._id}
+                      key={course._id}
+                      value={course._id}
                     >
-                      {c.name}
+                      {course.name}
                     </option>
                   ))}
                 </select>
               </Field>
+
+              <Field label="Training provider / instructor">
+  <input
+    value={form.provider || ''}
+    onChange={e =>
+      setForm({
+        ...form,
+        provider: e.target.value,
+      })
+    }
+  />
+</Field>
             </div>
 
             <Field label="Completion date">
@@ -560,19 +569,14 @@ export default function Training() {
               }}
             >
               <Field label="Upload certificate">
-                <div
-                  style={{
-                    border:
-                      '2px dashed #d1d5db',
-                    borderRadius: 14,
-                    padding: 28,
-                    textAlign: 'center',
-                    color: '#6b7280',
-                  }}
-                >
-                  Click to upload or drag &
-                  drop
-                </div>
+                <input
+  type="file"
+  accept=".pdf,.jpg,.jpeg,.png"
+  onChange={e =>
+    setFile(e.target.files?.[0])
+  }
+/>
+               
               </Field>
             </div>
           </div>
