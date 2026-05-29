@@ -78,7 +78,10 @@ export const Facility = model('Facility', new Schema({
 
 // ---------- STAFF ----------
 export const Staff = model('Staff', new Schema({
-  user:         ref('User'),
+   fullName: {
+    type: String,
+    required: true,
+  },
   employeeId:   { type: String, unique: true, sparse: true },
   facility:     ref('Facility'),
   title:        String,
@@ -320,17 +323,78 @@ export const HipaaAccessLog = model('HipaaAccessLog', new Schema({
 }, opts));
 
 // ---------- LICENSING ----------
-export const LicensingRecord = model('LicensingRecord', new Schema({
-  facility:      { ...ref('Facility'), required: true },
-  agency:        { type: String, required: true },
-  licenseType:   { type: String, required: true },
-  licenseNumber: { type: String, required: true },
-  issuedOn:      Date,
-  expiresOn:     { type: Date, required: true },
-  status:        { type: String, default: 'active' },
-  documentUrl:   String,
-  notes:         String,
-}, opts));
+export const LicensingRecord = model(
+  'LicensingRecord',
+  new Schema(
+    {
+      facility: {
+        ...ref('Facility'),
+        required: true,
+      },
+
+      agency: {
+        type: String,
+        required: true,
+      },
+
+      licenseType: {
+        type: String,
+        required: true,
+      },
+
+      licenseNumber: {
+        type: String,
+        required: true,
+      },
+
+      issuedOn: Date,
+
+      expiresOn: {
+        type: Date,
+        required: true,
+      },
+
+      status: {
+        type: String,
+        enum: [
+          'active',
+          'renewal_due',
+          'expired',
+          'suspended',
+        ],
+        default: 'active',
+      },
+
+      capacity: Number,
+
+      census: Number,
+
+      lastInspectionDate: Date,
+
+      inspectionResult: {
+        type: String,
+        default: 'No deficiencies',
+      },
+
+      violationsCount: {
+        type: Number,
+        default: 0,
+      },
+
+      inspectionReportUrl: String,
+
+      renewalStarted: {
+        type: Boolean,
+        default: false,
+      },
+
+      documentUrl: String,
+
+      notes: String,
+    },
+    opts
+  )
+);
 
 // ---------- AUDIT ----------
 export const AuditLog = model('AuditLog', new Schema({
@@ -369,39 +433,46 @@ export const OutcomeMetric = model('OutcomeMetric', new Schema({
 
 // ---------- DOCUMENTS ----------
 export const Document = model('Document', new Schema({
-  resident:       ref('Resident'),
-  facility:       ref('Facility'),
-  uploadedBy:     ref('User'),
+  resident: ref('Resident'),
+  facility: ref('Facility'),
+  uploadedBy: ref('User'),
+
+  
+
+  description: String,
 
   category: {
     type: String,
     enum: [
-      'legal',
-      'medical',
-      'education',
       'consent',
-      'licensing',
+      'medical',
+      'legal',
+      'education',
+      'placement',
+      'casa',
+      'case-plan',
       'other'
     ],
     default: 'other'
   },
 
-  title:          { type: String, required: true },
-  description:    String,
-
-  fileUrl:        { type: String, required: true },
-
-  fileSizeBytes:  Number,
-  mimeType:       String,
-
-  isConfidential: {
-    type: Boolean,
-    default: true
+  fileUrl: {
+    type: String,
+    required: true
   },
 
-  expiresOn:      Date,
+  documentDate: Date,
 
-  // ADD THESE ↓↓↓
+  requiresESign: {
+    type: String,
+    enum: [
+      'none',
+      'guardian',
+      'court',
+      'staff'
+    ],
+    default: 'none'
+  },
 
   status: {
     type: String,
@@ -415,16 +486,19 @@ export const Document = model('Document', new Schema({
 
   signatureProvider: String,
 
-  retentionYears: {
-    type: Number,
-    default: 7
+  isConfidential: {
+    type: Boolean,
+    default: true
   },
+
+  expiresOn: Date,
 
 }, opts));
 
 
 // ---------- TRAINING / CERTS ----------
 export const TrainingCourse = model('TrainingCourse', new Schema({
+  
   name:         { type: String, required: true },
   description:  String,
   requiredFor:  [String],

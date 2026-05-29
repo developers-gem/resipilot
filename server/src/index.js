@@ -7,10 +7,17 @@ import authRoutes from './routes/auth.js';
 import { crudRouter } from './routes/crud.js';
 import * as Models from './models/index.js';
 import certificationRoutes from './routes/certifications.js';
+import documentRoutes from './routes/documents.js';
+import staffRoutes from './routes/staff.js';
+import licensingRoutes from './routes/licensing.js';
 
 const app = express();
+
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
 app.use(express.json({ limit: '5mb' }));
+
+app.use('/uploads', express.static('uploads'));
+
 app.use(morgan('dev'));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
@@ -21,7 +28,7 @@ app.use('/api/auth', authRoutes);
 const resourceMap = {
   'facilities':            Models.Facility,
   'residents':             Models.Resident,
-  'staff':                 Models.Staff,
+  // 'staff':                 Models.Staff,
   'guardians':             Models.Guardian,
   'appointments':          Models.Appointment,
   'medications':           Models.Medication,
@@ -29,11 +36,11 @@ const resourceMap = {
   'behavioral-incidents':  Models.BehavioralIncident,
   'incident-reports':      Models.IncidentReport,
   'notifications':         Models.Notification,
-  'documents':             Models.Document,
+  // 'documents':             Models.Document,
   'tasks':                 Models.Task,
   'bip-plans':             Models.BipPlan,
   'shifts':                Models.Shift,
-  'licensing':             Models.LicensingRecord,
+  // 'licensing':             Models.LicensingRecord,
   // 'certifications':        Models.StaffCertification,
   'training-courses':      Models.TrainingCourse,
   'outcome-metrics':       Models.OutcomeMetric,
@@ -46,10 +53,12 @@ for (const [path, Model] of Object.entries(resourceMap)) {
   
 }
 
-
+app.use('/api/documents', documentRoutes);
 
 // Custom populated certifications routes
 app.use('/api/certifications', certificationRoutes);
+app.use('/api/staff', staffRoutes);
+app.use('/api/licensing', licensingRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);
