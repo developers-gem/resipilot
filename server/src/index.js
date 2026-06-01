@@ -10,6 +10,8 @@ import certificationRoutes from './routes/certifications.js';
 import documentRoutes from './routes/documents.js';
 import staffRoutes from './routes/staff.js';
 import licensingRoutes from './routes/licensing.js';
+import hipaaRoutes from './routes/hipaa.js';
+import guardianRoutes from './routes/guardians.js';
 
 const app = express();
 
@@ -29,7 +31,7 @@ const resourceMap = {
   'facilities':            Models.Facility,
   'residents':             Models.Resident,
   // 'staff':                 Models.Staff,
-  'guardians':             Models.Guardian,
+  // 'guardians':             Models.Guardian,
   'appointments':          Models.Appointment,
   'medications':           Models.Medication,
   'mar':                   Models.MarEntry,
@@ -55,12 +57,17 @@ for (const [path, Model] of Object.entries(resourceMap)) {
 
 app.use('/api/documents', documentRoutes);
 
-// Custom populated certifications routes
+// Custom populated certifications routes je jr siw sdoa disw  cjd ad 
 app.use('/api/certifications', certificationRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/licensing', licensingRoutes);
+app.use('/api/hipaa-log', hipaaRoutes);
+app.use('/api/guardians', guardianRoutes);
+
+
 
 app.use((err, _req, res, _next) => {
+  
   console.error(err);
   res.status(err.status || 500).json({ error: err.message || 'Server error' });
 });
