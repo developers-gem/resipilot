@@ -13,6 +13,8 @@ import licensingRoutes from './routes/licensing.js';
 import hipaaRoutes from './routes/hipaa.js';
 import guardianRoutes from './routes/guardians.js';
 import appointments from './routes/appointments.js';
+import behavioralRoutes from './routes/behavioral-incidents.js';
+
 
 const app = express();
 
@@ -31,20 +33,14 @@ app.use('/api/auth', authRoutes);
 const resourceMap = {
   'facilities':            Models.Facility,
   'residents':             Models.Resident,
-  // 'staff':                 Models.Staff,
-  // 'guardians':             Models.Guardian,
-  // 'appointments':          Models.Appointment,
   'medications':           Models.Medication,
   'mar':                   Models.MarEntry,
   'behavioral-incidents':  Models.BehavioralIncident,
   'incident-reports':      Models.IncidentReport,
   'notifications':         Models.Notification,
-  // 'documents':             Models.Document,
   'tasks':                 Models.Task,
   'bip-plans':             Models.BipPlan,
   'shifts':                Models.Shift,
-  // 'licensing':             Models.LicensingRecord,
-  // 'certifications':        Models.StaffCertification,
   'training-courses':      Models.TrainingCourse,
   'outcome-metrics':       Models.OutcomeMetric,
   'audit':                 Models.AuditLog,
@@ -65,6 +61,12 @@ app.use('/api/licensing', licensingRoutes);
 app.use('/api/hipaa-log', hipaaRoutes);
 app.use('/api/guardians', guardianRoutes);
 app.use('/api/appointments', appointments);
+app.use(
+  '/api/behavioral-incidents',
+  behavioralRoutes
+);
+
+
 
 app.use((err, _req, res, _next) => {
   
