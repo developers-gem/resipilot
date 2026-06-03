@@ -124,7 +124,7 @@ export default function Documents() {
       );
     }
 
-    
+
     return (
       <span className="badge gray">
         {status || 'Document'}
@@ -518,7 +518,7 @@ export default function Documents() {
               </Field>
             </div>
 
-            <Field label="Document type">
+            <Field label="Category">
               <select
                 value={form.category}
                 onChange={e =>
@@ -725,28 +725,28 @@ export default function Documents() {
       )}
 
       {previewDoc && (
-  <Modal
-    title={previewDoc.title}
-    onClose={() => setPreviewDoc(null)}
-  >
-    <div
-      style={{
-        height: '80vh',
-      }}
-    >
-      <iframe
-        src={`http://localhost:5000${previewDoc.fileUrl}`}
-        title="Document Preview"
-        width="100%"
-        height="100%"
-        style={{
-          border: 'none',
-          borderRadius: 12,
-        }}
-      />
-    </div>
-  </Modal>
-)}
+        <Modal
+          title={previewDoc.title}
+          onClose={() => setPreviewDoc(null)}
+        >
+          <div
+            style={{
+              height: '80vh',
+            }}
+          >
+            <iframe
+              src={`http://localhost:5000${previewDoc.fileUrl}`}
+              title="Document Preview"
+              width="100%"
+              height="100%"
+              style={{
+                border: 'none',
+                borderRadius: 12,
+              }}
+            />
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

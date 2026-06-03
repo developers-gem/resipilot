@@ -33,7 +33,20 @@ export default function Behavioral() {
   );
 }
 function NewIncident({ residents, onSave, onClose }) {
-  const [d, setD] = useState({ resident: residents[0]?._id || '', occurredAt: new Date().toISOString().slice(0,16), severity: '2', antecedent: '', behavior: '', consequence: '', injury: false });
+  const [d, setD] = useState({
+    resident: residents[0]?._id || '',
+    occurredAt: new Date().toISOString().slice(0, 16),
+    location: '',
+    behaviorTypes: [],
+    severity: '2',
+    antecedent: '',
+    behavior: '',
+    consequence: '',
+    interventions: [],
+    durationMin: '',
+    injury: false
+  });
+
   return (
     <Modal title="Behavioral incident (ABC)" onClose={onClose} footer={
       <><button className="btn" onClick={onClose}>Cancel</button>
@@ -47,12 +60,63 @@ function NewIncident({ residents, onSave, onClose }) {
       </div>
       <Field label="Severity">
         <select value={d.severity} onChange={e => setD({ ...d, severity: e.target.value })}>
-          {['1','2','3','4','5'].map(v => <option key={v}>{v}</option>)}
+          {['1', '2', '3', '4', '5'].map(v => <option key={v}>{v}</option>)}
         </select>
       </Field>
       <Field label="Antecedent (what triggered it?)"><textarea rows="2" value={d.antecedent} onChange={e => setD({ ...d, antecedent: e.target.value })} /></Field>
       <Field label="Behavior (what happened?)"><textarea rows="3" value={d.behavior} onChange={e => setD({ ...d, behavior: e.target.value })} /></Field>
       <Field label="Consequence (response & outcome)"><textarea rows="2" value={d.consequence} onChange={e => setD({ ...d, consequence: e.target.value })} /></Field>
+      <Field label="Location">
+        <input
+          value={d.location}
+          onChange={e =>
+            setD({
+              ...d,
+              location: e.target.value
+            })
+          }
+        />
+      </Field>
+      <Field label="Behavior Type">
+  <select
+    onChange={e =>
+      setD({
+        ...d,
+        behaviorTypes: [e.target.value]
+      })
+    }
+  >
+    <option value="">Select</option>
+    <option value="Aggression">Aggression</option>
+    <option value="Property Destruction">Property Destruction</option>
+    <option value="Self Harm">Self Harm</option>
+    <option value="Verbal Outburst">Verbal Outburst</option>
+    <option value="Elopement">Elopement</option>
+  </select>
+</Field>
+<Field label="Intervention Used">
+  <input
+    placeholder="Redirection, De-escalation, etc."
+    onChange={e =>
+      setD({
+        ...d,
+        interventions: [e.target.value]
+      })
+    }
+  />
+</Field>
+<Field label="Duration (minutes)">
+  <input
+    type="number"
+    value={d.durationMin}
+    onChange={e =>
+      setD({
+        ...d,
+        durationMin: Number(e.target.value)
+      })
+    }
+  />
+</Field>
       <label className="row"><input type="checkbox" checked={d.injury} onChange={e => setD({ ...d, injury: e.target.checked })} /> Injury occurred</label>
     </Modal>
   );
