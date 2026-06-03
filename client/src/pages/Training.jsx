@@ -5,6 +5,7 @@ import {
   Modal,
   Field,
 } from '../components/ui.jsx';
+import { api } from '../lib/api.js';
 
 export default function Training() {
   const certs = useResource('/certifications');
@@ -16,7 +17,6 @@ export default function Training() {
   const [form, setForm] = useState({
     staff: '',
     course: '',
-    certName: '',
     issuedOn: '',
     expiresOn: '',
     score: '',
@@ -79,41 +79,52 @@ export default function Training() {
   // ===== CREATE =====
 
   async function logTraining() {
-    if (
-      !form.staff ||
-      !form.course ||
-      !form.issuedOn
-    ) {
-      return alert('Please fill required fields');
-    }
+  if (
+    !form.staff ||
+    !form.course ||
+    !form.issuedOn
+  ) {
+    return alert('Please fill required fields');
+  }
 
-    const course = courses.items.find(
-      c => c._id === form.course
+  const fd = new FormData();
+
+  fd.append('staff', form.staff);
+  fd.append('course', form.course);
+  fd.append('issuedOn', form.issuedOn);
+  fd.append('expiresOn', form.expiresOn);
+  fd.append('status', 'valid');
+
+  if (file) {
+    fd.append('certificate', file);
+  }
+
+  try {
+    await api.upload(
+      '/certifications',
+      fd
     );
-
-    await certs.create({
-      staff: form.staff,
-      course: form.course,
-      certName: course?.name || 'Certification',
-      issuedOn: form.issuedOn,
-      expiresOn: form.expiresOn,
-      status: 'valid',
-    });
 
     setOpen(false);
 
     setForm({
       staff: '',
       course: '',
-      certName: '',
       issuedOn: '',
       expiresOn: '',
       score: '',
       hours: '',
+        provider: '',
+
     });
 
+    setFile(null);
+
     certs.refresh();
+  } catch (err) {
+    alert(err.message);
   }
+}
 
   function getStatus(cert) {
     if (!cert) {
