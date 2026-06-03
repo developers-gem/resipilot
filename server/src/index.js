@@ -12,6 +12,7 @@ import staffRoutes from './routes/staff.js';
 import licensingRoutes from './routes/licensing.js';
 import hipaaRoutes from './routes/hipaa.js';
 import guardianRoutes from './routes/guardians.js';
+import appointments from './routes/appointments.js';
 
 const app = express();
 
@@ -32,7 +33,7 @@ const resourceMap = {
   'residents':             Models.Resident,
   // 'staff':                 Models.Staff,
   // 'guardians':             Models.Guardian,
-  'appointments':          Models.Appointment,
+  // 'appointments':          Models.Appointment,
   'medications':           Models.Medication,
   'mar':                   Models.MarEntry,
   'behavioral-incidents':  Models.BehavioralIncident,
@@ -63,8 +64,7 @@ app.use('/api/staff', staffRoutes);
 app.use('/api/licensing', licensingRoutes);
 app.use('/api/hipaa-log', hipaaRoutes);
 app.use('/api/guardians', guardianRoutes);
-
-
+app.use('/api/appointments', appointments);
 
 app.use((err, _req, res, _next) => {
   
