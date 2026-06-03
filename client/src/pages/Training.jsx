@@ -12,7 +12,7 @@ export default function Training() {
   const staff = useResource('/staff');
 
   const [open, setOpen] = useState(false);
-const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null);
   const [form, setForm] = useState({
     staff: '',
     course: '',
@@ -373,12 +373,12 @@ const [file, setFile] = useState(null);
               return (
                 <tr key={row.staff._id}>
                   <td
-  style={{
-    fontWeight: 600,
-  }}
->
-  {row.staff.fullName || row.staff.employeeId}
-</td>
+                    style={{
+                      fontWeight: 600,
+                    }}
+                  >
+                    {row.staff.fullName || row.staff.employeeId}
+                  </td>
 
                   <td>
                     <span className="badge blue">
@@ -397,10 +397,10 @@ const [file, setFile] = useState(null);
                   <td>
                     <span
                       className={`badge ${percent === 100
-                          ? 'green'
-                          : percent >= 75
-                            ? 'amber'
-                            : 'red'
+                        ? 'green'
+                        : percent >= 75
+                          ? 'amber'
+                          : 'red'
                         }`}
                     >
                       {percent}%
@@ -499,16 +499,16 @@ const [file, setFile] = useState(null);
               </Field>
 
               <Field label="Training provider / instructor">
-  <input
-    value={form.provider || ''}
-    onChange={e =>
-      setForm({
-        ...form,
-        provider: e.target.value,
-      })
-    }
-  />
-</Field>
+                <input
+                  value={form.provider || ''}
+                  onChange={e =>
+                    setForm({
+                      ...form,
+                      provider: e.target.value,
+                    })
+                  }
+                />
+              </Field>
             </div>
 
             <Field label="Completion date">
@@ -570,13 +570,13 @@ const [file, setFile] = useState(null);
             >
               <Field label="Upload certificate">
                 <input
-  type="file"
-  accept=".pdf,.jpg,.jpeg,.png"
-  onChange={e =>
-    setFile(e.target.files?.[0])
-  }
-/>
-               
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  onChange={e =>
+                    setFile(e.target.files?.[0])
+                  }
+                />
+
               </Field>
             </div>
           </div>

@@ -16,6 +16,8 @@ export const NAV = [
   { section: 'OPERATIONS', items: [
     { to: '/facilities',   label: 'Facilities',         icon: 'ti-building' },
     { to: '/staff',        label: 'Staff',              icon: 'ti-id-badge' },
+        { to: '/training-courses',     label: 'Training courses',   icon: 'ti-certificate' },
+
     { to: '/training',     label: 'Training & Certs',   icon: 'ti-certificate' },
     { to: '/workload',     label: 'Tasks / Workload',   icon: 'ti-checklist' },
     { to: '/handoff',      label: 'Shift Handoff',      icon: 'ti-transfer' },
