@@ -364,6 +364,7 @@ export default function Training() {
               ))}
 
               <th>Overall</th>
+              <th>Certificate</th>
             </tr>
           </thead>
 
@@ -417,6 +418,27 @@ export default function Training() {
                       {percent}%
                     </span>
                   </td>
+                  
+                  <td>
+  {Object.values(row.certs).some(
+    c => c.certificateUrl
+  ) ? (
+    <button
+      className="btn ghost sm"
+      onClick={() =>
+        window.open(
+          Object.values(row.certs)[0]
+            ?.certificateUrl,
+          '_blank'
+        )
+      }
+    >
+      View Certificate
+    </button>
+  ) : (
+    '-'
+  )}
+</td>
                 </tr>
               );
             })}
