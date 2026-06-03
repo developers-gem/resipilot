@@ -105,7 +105,6 @@ router.post(
         await StaffCertification.create({
           staff: req.body.staff,
           course: req.body.course,
-          certName: req.body.certName,
           issuedOn: req.body.issuedOn,
           expiresOn: req.body.expiresOn,
           status:
