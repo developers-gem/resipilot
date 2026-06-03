@@ -304,7 +304,6 @@ export const Notification = model('Notification', new Schema({
 }, opts));
 
 
-
 // ---------- LICENSING ----------
 export const LicensingRecord = model(
   'LicensingRecord',
@@ -400,7 +399,6 @@ export const OutcomeMetric = model('OutcomeMetric', new Schema({
 }, opts));
 
 
-
 // ---------- DOCUMENTS ----------
 export const Document = model('Document', new Schema({
   resident: ref('Resident'),
@@ -478,7 +476,6 @@ export const TrainingCourse = model('TrainingCourse', new Schema({
 export const StaffCertification = model('StaffCertification', new Schema({
   staff: { ...ref('Staff'), required: true },
   course: ref('TrainingCourse'),
-  certName: { type: String, required: true },
   issuedOn: { type: Date, required: true },
   expiresOn: { type: Date, required: true },
   status: { type: String, enum: ['valid', 'expiring', 'expired'], default: 'valid' },
