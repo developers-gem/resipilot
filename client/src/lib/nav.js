@@ -19,7 +19,7 @@ export const NAV = [
         { to: '/training-courses',     label: 'Training courses',   icon: 'ti-certificate' },
 
     { to: '/training',     label: 'Training & Certs',   icon: 'ti-certificate' },
-    { to: '/workload',     label: 'Tasks / Workload',   icon: 'ti-checklist' },
+    // { to: '/workload',     label: 'Tasks / Workload',   icon: 'ti-checklist' },
     { to: '/handoff',      label: 'Shift Handoff',      icon: 'ti-transfer' },
     { to: '/documents',    label: 'Documents Vault',    icon: 'ti-folder' },
   ]},

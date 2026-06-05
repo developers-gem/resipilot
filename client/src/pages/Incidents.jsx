@@ -283,7 +283,8 @@ incidentDate: new Date()
   }}
 >
   File Report
-</button></>
+</button>
+</>
     }>
       <Field label="Resident *">
         <select
