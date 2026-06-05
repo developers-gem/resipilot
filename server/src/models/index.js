@@ -282,14 +282,42 @@ export const IncidentReport = model('IncidentReport', new Schema({
   facility: ref('Facility'),
   relatedIncident: ref('BehavioralIncident'),
   filedBy: ref('User'),
-  reportType: { type: String, required: true },
-  description: { type: String, required: true },
-  severity: { type: String, enum: ['1', '2', '3', '4', '5'] },
-  status: { type: String, enum: ['draft', 'submitted', 'under_review', 'closed'], default: 'draft' },
+
+  incidentDate: Date,
+  incidentTime: String,
+
+  location: String,
+
+  description: {
+    type: String,
+    required: true
+  },
+
+  immediateActions: String,
+
+  staffESignature: String,
+
+  severity: {
+    type: String,
+    enum: ['1', '2', '3', '4', '5']
+  },
+
+  status: {
+    type: String,
+    enum: [
+      'draft',
+      'submitted',
+      'under_review',
+      'closed'
+    ],
+    default: 'draft'
+  },
+
   filedAt: Date,
   dueAt: Date,
   externalRef: String,
-  attachments: Schema.Types.Mixed,
+  attachments: Schema.Types.Mixed
+
 }, opts));
 
 // ---------- NOTIFICATIONS ----------
