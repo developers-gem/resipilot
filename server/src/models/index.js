@@ -496,20 +496,41 @@ export const Task = model('Task', new Schema({
   completedAt: Date,
 }, opts));
 
-// ---------- BIP ----------
 export const BipPlan = model('BipPlan', new Schema({
   resident: { ...ref('Resident'), required: true },
   author: ref('User'),
+
   title: { type: String, required: true },
+
   targetBehavior: { type: String, required: true },
-  hypothesis: String,
+
+  antecedents: String,
+
+  behaviorDefinition: String,
+
+  behaviorFunction: String,
+
   replacement: String,
+
   reinforcement: String,
+
   crisisPlan: String,
-  status: { type: String, enum: ['draft', 'active', 'archived'], default: 'draft' },
+
+  status: {
+    type: String,
+    enum: ['draft', 'active', 'archived'],
+    default: 'draft'
+  },
+
   effectiveFrom: Date,
+
   effectiveTo: Date,
-  strategies: [{ phase: String, description: String, sortOrder: Number }],
+
+  strategies: [{
+    phase: String,
+    description: String,
+    sortOrder: Number
+  }]
 }, opts));
 
 // ---------- SHIFTS ----------
