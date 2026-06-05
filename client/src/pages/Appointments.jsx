@@ -56,11 +56,11 @@ export default function Appointments() {
                   ).toLocaleString()}
                 </td>
 
-               <td>
-  {a.resident
-    ? `${a.resident.firstName} ${a.resident.lastName}`
-    : '—'}
-</td>
+                <td>
+                  {a.resident
+                    ? `${a.resident.firstName} ${a.resident.lastName}`
+                    : '—'}
+                </td>
 
                 <td>{a.title}</td>
 
@@ -70,21 +70,20 @@ export default function Appointments() {
                   </span>
                 </td>
 
-               <td>
-  <span
-    className={`badge ${
-      a.status === 'completed'
-        ? 'green'
-        : a.status === 'cancelled'
-        ? 'red'
-        : a.status === 'no_show'
-        ? 'orange'
-        : 'blue'
-    }`}
-  >
-    {a.status}
-  </span>
-</td>
+                <td>
+                  <span
+                    className={`badge ${a.status === 'completed'
+                        ? 'green'
+                        : a.status === 'cancelled'
+                          ? 'red'
+                          : a.status === 'no_show'
+                            ? 'orange'
+                            : 'blue'
+                      }`}
+                  >
+                    {a.status}
+                  </span>
+                </td>
 
                 <td>
                   <button

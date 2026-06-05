@@ -9,7 +9,7 @@ export const NAV = [
     { to: '/residents',    label: 'Residents',          icon: 'ti-users' },
     { to: '/mar',          label: 'MAR (Medications)',  icon: 'ti-pill' },
     { to: '/behavioral',   label: 'Behavioral Log',     icon: 'ti-mood-confuzed' },
-    { to: '/bip',          label: 'BIP Plans',          icon: 'ti-clipboard-list' },
+    // { to: '/bip',          label: 'BIP Plans',          icon: 'ti-clipboard-list' },
     { to: '/incidents',    label: 'Incident Reports',   icon: 'ti-alert-triangle' },
     { to: '/appointments', label: 'Appointments',       icon: 'ti-calendar-event' },
   ]},
