@@ -27,8 +27,8 @@ export const NAV = [
     { to: '/licensing',    label: 'State Licensing',    icon: 'ti-license' },
     { to: '/hipaa',        label: 'HIPAA Access Log',   icon: 'ti-shield-lock' },
     { to: '/audit',        label: 'Audit Trail',        icon: 'ti-history' },
-    { to: '/outcomes',     label: 'Outcome Metrics',    icon: 'ti-chart-line' },
-    { to: '/court-report', label: 'Court Reports',      icon: 'ti-gavel' },
+    // { to: '/outcomes',     label: 'Outcome Metrics',    icon: 'ti-chart-line' },
+    // { to: '/court-report', label: 'Court Reports',      icon: 'ti-gavel' },
   ]},
   { section: 'INTAKE / DISCHARGE', items: [
     { to: '/discharge',    label: 'Discharge Planning', icon: 'ti-logout' },
