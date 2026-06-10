@@ -2,7 +2,7 @@
 export const NAV = [
   { section: 'OVERVIEW', items: [
     { to: '/',             label: 'Dashboard',          icon: 'ti-layout-dashboard' },
-    { to: '/search',       label: 'Global Search',      icon: 'ti-search' },
+    // { to: '/search',       label: 'Global Search',      icon: 'ti-search' },
     { to: '/notifications',label: 'Notifications',      icon: 'ti-bell' },
   ]},
   { section: 'CARE', items: [
