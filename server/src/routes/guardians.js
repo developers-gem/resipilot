@@ -3,35 +3,102 @@ import Guardian from '../models/Guardian.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-  const items = await Guardian.find()
-    .populate('resident', 'firstName lastName');
+/**
+ * GET ALL GUARDIANS
+ */
+router.get('/', async (req, res, next) => {
+  try {
+    const items = await Guardian.find()
+      .populate({
+        path: 'resident',
+        select: 'firstName lastName facility',
+        populate: {
+          path: 'facility',
+          select: 'name city state'
+        }
+      });
 
-  res.json(items);
+    res.json(items);
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.post('/', async (req, res) => {
-  const item = await Guardian.create(req.body);
+/**
+ * CREATE GUARDIAN
+ */
+router.post('/', async (req, res, next) => {
+  try {
+    const item = await Guardian.create(req.body);
 
-  const populated = await Guardian.findById(item._id)
-    .populate('resident', 'firstName lastName');
+    const populated = await Guardian.findById(item._id)
+      .populate({
+        path: 'resident',
+        select: 'firstName lastName facility',
+        populate: {
+          path: 'facility',
+          select: 'name city state'
+        }
+      });
 
-  res.status(201).json(populated);
+    res.status(201).json(populated);
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.patch('/:id', async (req, res) => {
-  const item = await Guardian.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true }
-  ).populate('resident', 'firstName lastName');
+/**
+ * UPDATE GUARDIAN
+ */
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const item = await Guardian.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true
+      }
+    ).populate({
+      path: 'resident',
+      select: 'firstName lastName facility',
+      populate: {
+        path: 'facility',
+        select: 'name city state'
+      }
+    });
 
-  res.json(item);
+    if (!item) {
+      return res
+        .status(404)
+        .json({ error: 'Guardian not found' });
+    }
+
+    res.json(item);
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.delete('/:id', async (req, res) => {
-  await Guardian.findByIdAndDelete(req.params.id);
-  res.json({ ok: true });
+/**
+ * DELETE GUARDIAN
+ */
+router.delete('/:id', async (req, res, next) => {
+  try {
+    const item = await Guardian.findByIdAndDelete(
+      req.params.id
+    );
+
+    if (!item) {
+      return res
+        .status(404)
+        .json({ error: 'Guardian not found' });
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;

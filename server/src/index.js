@@ -14,7 +14,8 @@ import hipaaRoutes from './routes/hipaa.js';
 import guardianRoutes from './routes/guardians.js';
 import appointments from './routes/appointments.js';
 import behavioralRoutes from './routes/behavioral-incidents.js';
-
+import visitRoutes from './routes/visits.js';
+import guardianMessageRoutes from './routes/guardianMessages.js';
 
 const app = express();
 
@@ -66,7 +67,12 @@ app.use(
   behavioralRoutes
 );
 
+app.use('/api/visits', visitRoutes);
 
+app.use(
+  '/api/guardian-messages',
+  guardianMessageRoutes
+);
 
 app.use((err, _req, res, _next) => {
   
@@ -84,3 +90,6 @@ mongoose.connect(MONGO_URI).then(() => {
   console.error('Mongo connection error:', err.message);
   process.exit(1);
 });
+
+
+
