@@ -7,15 +7,15 @@ export default function App() {
   const nav = useNavigate();
   const loc = useLocation();
   const title = NAV.flatMap(s => s.items).find(i => i.to === loc.pathname)?.label
-              || (loc.pathname.startsWith('/residents/') ? 'Resident Detail' : 'FrontLines Care');
+              || (loc.pathname.startsWith('/residents/') ? 'Resident Detail' : 'Habitat Pilot');
 
   return (
     <div className="app">
       <aside className="sidebar">
         <div className="sb-brand">
-          <div className="sb-logo">FC</div>
+          <div className="sb-logo">HP</div>
           <div>
-            <div className="sb-name">FrontLines Care</div>
+            <div className="sb-name">Habitat Pilot</div>
             <div className="sb-sub">Group-home operations</div>
           </div>
         </div>

@@ -19,9 +19,9 @@ export default function Login() {
     <div className="login">
       <form className="login-card" onSubmit={submit}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-          <div className="sb-logo" style={{ width: 40, height: 40 }}>FC</div>
+          <div className="sb-logo" style={{ width: 40, height: 40 }}>HP</div>
           <div>
-            <h1>FrontLines Care</h1>
+            <h1>Habitat Pilot</h1>
             <div className="sub">Sign in to continue</div>
           </div>
         </div>
@@ -31,9 +31,9 @@ export default function Login() {
         <button className="btn primary" disabled={busy} style={{ width: '100%', justifyContent: 'center', marginTop: 8 }}>
           {busy ? 'Signing in…' : 'Sign in'}
         </button>
-        <div style={{ marginTop: 14, fontSize: 11, color: 'var(--tx3)' }}>
+        {/* <div style={{ marginTop: 14, fontSize: 11, color: 'var(--tx3)' }}>
           Seed user: <code>admin@example.com</code> / <code>admin123</code>
-        </div>
+        </div> */}
       </form>
     </div>
   );

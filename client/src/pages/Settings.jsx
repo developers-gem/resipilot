@@ -17,7 +17,7 @@ export default function Settings() {
       <div className="card" style={{ marginTop: 14 }}>
         {tab === 'general' && <>
           <h3>Organisation</h3>
-          <div className="field"><label>Display name</label><input defaultValue="FrontLines Care" /></div>
+          <div className="field"><label>Display name</label><input defaultValue="Habitat Pilot" /></div>
           <div className="field"><label>Timezone</label><select><option>America/Los_Angeles</option><option>America/New_York</option><option>UTC</option></select></div>
           <button className="btn primary">Save</button>
         </>}
