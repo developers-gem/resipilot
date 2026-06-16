@@ -52,10 +52,10 @@ export default function App() {
           <div className="spacer" />
           <Link className="btn ghost" to="/notifications"><i className="ti ti-bell" /></Link>
         </div>
-        <div className="legacy-banner">
+        {/* <div className="legacy-banner">
           <i className="ti ti-info-circle" /> Reference wireframe still available:
           <a href="/legacy.html" target="_blank" rel="noreferrer">open original HTML mockup</a>
-        </div>
+        </div> */}
         <div className="page"><Outlet /></div>
       </main>
     </div>
