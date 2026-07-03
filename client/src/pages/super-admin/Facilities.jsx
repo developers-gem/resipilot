@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { useResource, PageHeader, Modal, Field } from '../components/ui.jsx';
-
+import {
+  useResource,
+  PageHeader,
+  Modal,
+  Field,
+} from "../../components/ui.jsx";
 export default function Facilities() {
   const { items, create, remove } = useResource('/facilities');
   const [showAdd, setShowAdd] = useState(false);

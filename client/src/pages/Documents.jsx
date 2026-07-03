@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { api } from '../lib/api.js';
+import { adminApi as api } from '../lib/adminApi.js';
 import {
   useResource,
   PageHeader,

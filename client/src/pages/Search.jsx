@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api } from '../lib/api.js';
+import { adminApi as api } from '../lib/adminApi.js';
 import { PageHeader } from '../components/ui.jsx';
 
 export default function Search() {

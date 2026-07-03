@@ -440,7 +440,7 @@ function AddResidentModal({ facilities, onSave, onClose }) {
                 onChange={e =>
                   setD({ ...d, lastName: e.target.value })
                 }
-              />
+              /> 
             </Field>
           </div>
           <Field label="Preferred name">

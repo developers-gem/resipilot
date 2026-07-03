@@ -6,8 +6,7 @@ import {
   EmptyState,
   useResource
 } from '../components/ui.jsx';
-import { api } from '../lib/api.js';
-
+import { adminApi as api } from '../lib/adminApi.js';
 
 export default function GuardianPortal() {
   const [activeTab, setActiveTab] = useState('all');
@@ -19,10 +18,11 @@ export default function GuardianPortal() {
 
   const facilities = useResource('/facilities');
 
-const messages = useResource('/guardian-messages');
+  const messages = useResource('/guardian-messages');
 
-const visits = useResource('/visits');
+  const visits = useResource('/visits');
   const [selectedGuardian, setSelectedGuardian] = useState(null);
+
 
   const filteredGuardians = guardians.items.filter(g => {
     const q = search.toLowerCase();
@@ -48,15 +48,17 @@ const visits = useResource('/visits');
     address: '',
     contactAuthorization: 'Approved - Supervised Visits',
     backgroundCheckStatus: 'Pending',
-    fosterLicenseNumber: ''
+    fosterLicenseNumber: '',
+     password: '',
+  confirmPassword: '',
   });
   const selectedResident = residents.items.find(
-  r => r._id === form.resident
-);
+    r => r._id === form.resident
+  );
 
-const selectedFacility = facilities.items.find(
-  f => f._id === selectedResident?.facility
-);
+  const selectedFacility = facilities.items.find(
+    f => f._id === selectedResident?.facility
+  );
 
   const [messageGuardian, setMessageGuardian] = useState(null);
   const [messageText, setMessageText] = useState('');
@@ -85,6 +87,23 @@ const selectedFacility = facilities.items.find(
       return alert('Phone is required');
     }
 
+    if (!form.email.trim()) {
+  return alert('Email is required');
+}
+
+if (!form.password.trim()) {
+  return alert('Password is required');
+}
+
+if (form.password.length < 6) {
+  return alert('Password must be at least 6 characters');
+}
+
+if (form.password !== form.confirmPassword) {
+  return alert('Passwords do not match');
+}
+
+
     try {
       await guardians.create(form);
 
@@ -111,48 +130,90 @@ const selectedFacility = facilities.items.find(
   }
 
 
- async function sendMessage() {
-  if (!messageGuardian) return;
+  async function sendMessage() {
+    if (!messageGuardian) return;
 
-  await api.post('/guardian-messages', {
-    guardian: messageGuardian._id,
-    resident:
-      messageGuardian.resident?._id ||
-      messageGuardian.resident,
-    message: messageText,
-    direction: 'Outgoing',
-  });
+    await api.post('/guardian-messages/reply', {
+      guardian: messageGuardian._id,
+      resident:
+        messageGuardian.resident?._id ||
+        messageGuardian.resident,
+      sender: 'Staff',
+      message: messageText,
+    });
+
+    await messages.refresh();
+
+    setMessageText('');
+    setMessageGuardian(null);
+
+    setActiveTab('messages');
+  }
+
+  async function openConversation(guardian) {
+  setMessageGuardian(guardian);
+
+  const unreadMessages = messages.items.filter(
+    m =>
+      m.guardian?._id === guardian._id &&
+      m.sender === 'Guardian' &&
+      !m.isRead
+  );
+
+  await Promise.all(
+    unreadMessages.map(msg =>
+      api.patch(`/guardian-messages/${msg._id}/read`)
+    )
+  );
 
   await messages.refresh();
-
-  setMessageText('');
-  setMessageGuardian(null);
-
-  setActiveTab('messages');
 }
 
- async function scheduleVisit() {
-  if (!visitGuardian) return;
+  async function scheduleVisit() {
+    if (!visitGuardian) return;
 
-  await api.post('/visits', {
-    guardian: visitGuardian._id,
-    resident:
-      visitGuardian.resident?._id ||
-      visitGuardian.resident,
-    scheduledFor: visitDate,
-  });
+    await api.post('/visits', {
+      guardian: visitGuardian._id,
+      resident:
+        visitGuardian.resident?._id ||
+        visitGuardian.resident,
+      scheduledFor: visitDate,
+    });
 
-  await visits.refresh();
+    await visits.refresh();
 
-  setVisitDate('');
-  setVisitGuardian(null);
+    setVisitDate('');
+    setVisitGuardian(null);
 
-  setActiveTab('visits');
+    setActiveTab('visits');
+  }
+
+ async function approveVisit(id) {
+  await api.patch(`/visits/${id}/approve`);
+  visits.refresh();
 }
+
+async function rejectVisit(id) {
+  await api.patch(`/visits/${id}/reject`);
+  visits.refresh();
+}
+
+
+const conversation = messageGuardian
+  ? messages.items.filter(
+      m => m.guardian?._id === messageGuardian._id
+    )
+  : [];
+
+
+
+
+
+
   return (
     <>
       <PageHeader
-        title="Guardian Portal"
+        title="Guardian Management"
         actions={
           <>
             <button className="btn">
@@ -229,6 +290,7 @@ const selectedFacility = facilities.items.find(
           </button>
 
           <button
+
             className={`btn ${activeTab === 'messages' ? 'primary' : ''}`}
             onClick={() => setActiveTab('messages')}
           >
@@ -241,180 +303,183 @@ const selectedFacility = facilities.items.find(
       {/* Guardian Cards */}
       {activeTab === 'all' && (
         <>
-          {filteredGuardians.map(g => (
-            <div
-              key={g._id}
-              className="card"
-              style={{
-                marginBottom: 16
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  gap: 20
-                }}
+         {filteredGuardians.map(g => {
+  const unreadCount = messages.items.filter(
+    m =>
+      m.guardian?._id === g._id &&
+      m.sender === 'Guardian' &&
+      !m.isRead
+  ).length;
+
+  return (
+    <div
+      key={g._id}
+      className="card"
+      style={{
+        marginBottom: 16,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: 20,
+        }}
+      >
+        {/* Your existing card content */}
+
+        <div>
+          <h3>
+            {g.firstName} {g.lastName}
+          </h3>
+
+          {/* ...rest of your card... */}
+        </div>
+
+        <div
+          style={{
+            display: 'flex',
+            gap: 10,
+            alignItems: 'flex-start',
+          }}
+        >
+          <button
+            className="btn"
+            onClick={() => setSelectedGuardian(g)}
+          >
+            Profile
+          </button>
+
+          <button
+            className="btn primary"
+            onClick={() => openConversation(g)}
+          >
+            Open Conversation
+
+            {unreadCount > 0 && (
+              <span
+                className="badge red"
+                style={{ marginLeft: 8 }}
               >
-                <div>
-                  <h3>
-                    {g.firstName} {g.lastName}
-                  </h3>
+                {unreadCount}
+              </span>
+            )}
+          </button>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: 8,
-                      flexWrap: 'wrap',
-                      marginBottom: 10
-                    }}
-                  >
-                    <span className="badge success">
-                      {g.contactAuthorization}                </span>
-
-                    <span className="badge">
-                      {g.type}
-                    </span>
-
-                    <span className="badge">
-                      {g.relationship}
-                    </span>
-                  </div>
-
-                  <p>
-                    <strong>Resident:</strong>{' '}
-                    {g.resident
-                      ? `${g.resident.firstName} ${g.resident.lastName}`
-                      : 'Not Assigned'}              </p>
-                      <p>
-  <strong>Facility:</strong>{' '}
-  {g.resident?.facility?.name || 'N/A'}
-</p>
-
-                  <p>
-                    <strong>Phone:</strong> {g.phone}
-                  </p>
-
-                  <p>
-                    <strong>Email:</strong> {g.email}
-                  </p>
-
-                  <p>
-                    <strong>Visits Allowed:</strong> {g.visitsAllowed || 'N/A'}
-                  </p>
-
-                  <p>
-                    <strong>Last Visit:</strong> {g.lastVisit
-                      ? new Date(g.lastVisit).toLocaleDateString()
-                      : 'No visits'}
-                  </p>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 10,
-                    alignItems: 'flex-start'
-                  }}
-                >
-                  <button
-                    className="btn"
-                    onClick={() => setSelectedGuardian(g)}
-                  >
-                    Profile
-                  </button>
-
-                  <button
-                    className="btn primary"
-                    onClick={() => setMessageGuardian(g)}
-                  >
-                    Send Message
-                  </button>
-
-                  <button
-                    className="btn primary"
-                    onClick={() => setVisitGuardian(g)}
-                  >
-                    Schedule Visit
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+          <button
+            className="btn primary"
+            onClick={() => setVisitGuardian(g)}
+          >
+            Schedule Visit
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+})}
         </>
       )}
 
-{activeTab === 'visits' && (
-  <div className="card">
-    <h2>Visit Schedule</h2>
+      {activeTab === 'visits' && (
+        <div className="card">
+          <h2>Visit Schedule</h2>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Resident</th>
-          <th>Guardian</th>
-          <th>Status</th>
-        </tr>
-      </thead>
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+    <th>Resident</th>
+    <th>Guardian</th>
+    <th>Status</th>
+    <th>Actions</th>
+              </tr>
+            </thead>
 
-      <tbody>
-        {visits.items.map(v => (
-          <tr key={v._id}>
-            <td>
-              {new Date(v.scheduledFor).toLocaleString()}
-            </td>
+            <tbody>
+              {visits.items.map(v => (
+                <tr key={v._id}>
+                  <td>
+                    {new Date(v.scheduledFor).toLocaleString()}
+                  </td>
 
-            <td>
-              {v.resident?.firstName} {v.resident?.lastName}
-            </td>
+                  <td>
+                    {v.resident?.firstName} {v.resident?.lastName}
+                  </td>
 
-            <td>
-              {v.guardian?.firstName} {v.guardian?.lastName}
-            </td>
+                  <td>
+                    {v.guardian?.firstName} {v.guardian?.lastName}
+                  </td>
 
-            <td>{v.status}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+                  <td>
+                    <span className={`badge ${v.status === 'Approved'
+                        ? 'green'
+                        : v.status === 'Rejected'
+                          ? 'red'
+                          : 'amber'
+                      }`}>
+                      {v.status}
+                    </span>
+                  </td>
 
+                  <td>
+                    {v.status === 'Pending' && (
+                      <>
+                        <button
+                          className="btn sm success"
+                          onClick={() => approveVisit(v._id)}
+                        >
+                          Approve
+                        </button>
 
-    {activeTab === 'messages' && (
-  <div className="card">
-    <h2>Messages</h2>
-
-    {messages.items.map(m => (
-      <div
-        key={m._id}
-        style={{
-          padding: 12,
-          borderBottom: '1px solid #eee'
-        }}
-      >
-        <strong>
-          {m.guardian?.firstName} {m.guardian?.lastName}
-        </strong>
-
-        <div>
-          Resident:
-          {' '}
-          {m.resident?.firstName}
-          {' '}
-          {m.resident?.lastName}
+                        <button
+                          className="btn sm danger"
+                          onClick={() => rejectVisit(v._id)}
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </td>          </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
+      )}
 
-        <div>{m.message}</div>
 
-        <small>
-          {new Date(m.createdAt).toLocaleString()}
-        </small>
-      </div>
-    ))}
-  </div>
-)}
+      {activeTab === 'messages' && (
+        <div className="card">
+          <h2>Messages</h2>
+
+          {messages.items.map(m => (
+            <div
+              key={m._id}
+              style={{
+                padding: 12,
+                borderBottom: '1px solid #eee'
+              }}
+            >
+              <strong>
+                {m.guardian?.firstName} {m.guardian?.lastName}
+              </strong>
+
+              <div>
+                Resident:
+                {' '}
+                {m.resident?.firstName}
+                {' '}
+                {m.resident?.lastName}
+              </div>
+
+              <div>{m.message}</div>
+
+              <small>
+                {new Date(m.createdAt).toLocaleString()}
+              </small>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Add Guardian Modal */}
       {open && (
@@ -620,7 +685,33 @@ const selectedFacility = facilities.items.find(
                   }
                 />
               </Field>
-              
+
+              <Field label="Password">
+  <input
+    type="password"
+    value={form.password}
+    onChange={e =>
+      setForm({
+        ...form,
+        password: e.target.value,
+      })
+    }
+  />
+</Field>
+
+<Field label="Confirm Password">
+  <input
+    type="password"
+    value={form.confirmPassword}
+    onChange={e =>
+      setForm({
+        ...form,
+        confirmPassword: e.target.value,
+      })
+    }
+  />
+</Field>
+
             </div>
 
             <div
@@ -652,84 +743,143 @@ const selectedFacility = facilities.items.find(
 
       {selectedGuardian && (
         <Modal
-  title="Guardian Profile"
-  onClose={() => setSelectedGuardian(null)}
->
-  <p>
-    <strong>Name:</strong>{' '}
-    {selectedGuardian.firstName} {selectedGuardian.lastName}
-  </p>
-
-  <p>
-    <strong>Relationship:</strong>{' '}
-    {selectedGuardian.relationship}
-  </p>
-
-  <p>
-    <strong>Resident:</strong>{' '}
-    {selectedGuardian.resident?.firstName}{' '}
-    {selectedGuardian.resident?.lastName}
-  </p>
-
-  <p>
-    <strong>Facility:</strong>{' '}
-    {selectedGuardian.resident?.facility?.name || 'N/A'}
-  </p>
-
-  <p>
-    <strong>Phone:</strong>{' '}
-    {selectedGuardian.phone}
-  </p>
-
-  <p>
-    <strong>Email:</strong>{' '}
-    {selectedGuardian.email}
-  </p>
-
-  <p>
-    <strong>Address:</strong>{' '}
-    {selectedGuardian.address}
-  </p>
-
-  <p>
-    <strong>Contact Authorization:</strong>{' '}
-    {selectedGuardian.contactAuthorization}
-  </p>
-
-  <p>
-    <strong>Background Check:</strong>{' '}
-    {selectedGuardian.backgroundCheckStatus}
-  </p>
-</Modal>
-      )}
-
-
-
-
-      {messageGuardian && (
-        <Modal
-          title={`Message ${messageGuardian.firstName}`}
-          onClose={() => setMessageGuardian(null)}
-          footer={
-            <button
-              className="btn primary"
-              onClick={sendMessage}
-            >
-              Send Message
-            </button>
-          }
+          title="Guardian Profile"
+          onClose={() => setSelectedGuardian(null)}
         >
-          <Field label="Message">
-            <textarea
-              rows="6"
-              value={messageText}
-              onChange={(e) =>
-                setMessageText(e.target.value)
-              }
-            />
-          </Field>
+          <p>
+            <strong>Name:</strong>{' '}
+            {selectedGuardian.firstName} {selectedGuardian.lastName}
+          </p>
+
+          <p>
+            <strong>Relationship:</strong>{' '}
+            {selectedGuardian.relationship}
+          </p>
+
+          <p>
+            <strong>Resident:</strong>{' '}
+            {selectedGuardian.resident?.firstName}{' '}
+            {selectedGuardian.resident?.lastName}
+          </p>
+
+          <p>
+            <strong>Facility:</strong>{' '}
+            {selectedGuardian.resident?.facility?.name || 'N/A'}
+          </p>
+
+          <p>
+            <strong>Phone:</strong>{' '}
+            {selectedGuardian.phone}
+          </p>
+
+          <p>
+            <strong>Email:</strong>{' '}
+            {selectedGuardian.email}
+          </p>
+
+          <p>
+            <strong>Address:</strong>{' '}
+            {selectedGuardian.address}
+          </p>
+
+          <p>
+            <strong>Contact Authorization:</strong>{' '}
+            {selectedGuardian.contactAuthorization}
+          </p>
+
+          <p>
+            <strong>Background Check:</strong>{' '}
+            {selectedGuardian.backgroundCheckStatus}
+          </p>
         </Modal>
       )}
+
+
+
+
+     {messageGuardian && (
+  <Modal
+    title={`${messageGuardian.firstName} ${messageGuardian.lastName}`}
+    onClose={() => setMessageGuardian(null)}
+    footer={
+      <>
+        <button
+          className="btn"
+          onClick={() => setMessageGuardian(null)}
+        >
+          Close
+        </button>
+
+        <button
+          className="btn primary"
+          disabled={!messageText.trim()}
+          onClick={sendMessage}
+        >
+          Send Reply
+        </button>
+      </>
+    }
+  >
+    <div
+      style={{
+        maxHeight: 350,
+        overflowY: 'auto',
+        marginBottom: 20,
+      }}
+    >
+      {conversation.length === 0 ? (
+        <p className="muted">
+          No messages yet.
+        </p>
+      ) : (
+        conversation.map(msg => (
+          <div
+            key={msg._id}
+            style={{
+              marginBottom: 15,
+              padding: 12,
+              borderRadius: 8,
+              background:
+                msg.sender === 'Guardian'
+                  ? '#eef6ff'
+                  : '#f3f4f6',
+            }}
+          >
+            <strong>
+              {msg.sender}
+            </strong>
+
+            <div
+              style={{
+                marginTop: 6,
+                marginBottom: 6,
+              }}
+            >
+              {msg.message}
+            </div>
+
+            <small className="muted">
+              {new Date(
+                msg.createdAt
+              ).toLocaleString()}
+            </small>
+          </div>
+        ))
+      )}
+    </div>
+
+    <Field label="Reply">
+      <textarea
+        rows="4"
+        placeholder="Type your reply..."
+        value={messageText}
+        onChange={e =>
+          setMessageText(e.target.value)
+        }
+      />
+    </Field>
+  </Modal>
+)}
 
 
       {visitGuardian && (
@@ -759,6 +909,7 @@ const selectedFacility = facilities.items.find(
     </>
   );
 }
+
 
 
 

@@ -1,12 +1,12 @@
 import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from './lib/auth.jsx';
-import { NAV } from './lib/nav.js';
+import { useGuardianAuth } from './lib/guardianAuth.jsx';
+import { GUARDIAN_NAV } from './lib/guardianNav.js';
 
-export default function App() {
-  const { user, logout } = useAuth();
+export default function GuardianApp() {
+const { guardian, logout } = useGuardianAuth();
   const nav = useNavigate();
   const loc = useLocation();
-  const title = NAV.flatMap(s => s.items).find(i => i.to === loc.pathname)?.label
+  const title = GUARDIAN_NAV.flatMap(s => s.items).find(i => i.to === loc.pathname)?.label
               || (loc.pathname.startsWith('/residents/') ? 'Resident Detail' : 'Habitat Pilot');
 
   return (
@@ -16,10 +16,11 @@ export default function App() {
           <div className="sb-logo">HP</div>
           <div>
             <div className="sb-name">Habitat Pilot</div>
-            <div className="sb-sub">Group-home operations</div>
+            <div className="sb-sub">  Guardian Portal
+</div>
           </div>
         </div>
-        {NAV.map(group => (
+        {GUARDIAN_NAV.map(group => (
           <div key={group.section}>
             <div className="sb-sec">{group.section}</div>
             {group.items.map(item => (
@@ -36,12 +37,13 @@ export default function App() {
           </div>
         ))}
         <div className="sb-user">
-          <div className="sb-avatar">{(user?.fullName || 'U').slice(0,1).toUpperCase()}</div>
-          <div>
-            <div style={{ fontWeight: 500 }}>{user?.fullName}</div>
-            <div style={{ color: 'var(--tx3)', fontSize: 10 }}>{(user?.roles || []).join(', ')}</div>
+<div className="sb-avatar">
+  {(guardian?.firstName?.[0] || 'U').toUpperCase()}
+</div>          <div>
+            <div style={{ fontWeight: 500 }}>{`${guardian?.firstName} ${guardian?.lastName}`}</div>
+            <div style={{ color: 'var(--tx3)', fontSize: 10 }}>{guardian?.relationship}</div>
           </div>
-          <button className="sb-logout" onClick={() => { logout(); nav('/login'); }} title="Sign out">
+          <button className="sb-logout" onClick={() => { logout(); nav('/guardian-login'); }} title="Sign out">
             <i className="ti ti-logout" />
           </button>
         </div>

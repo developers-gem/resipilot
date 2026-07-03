@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../lib/api.js';
+import { adminApi as api } from '../lib/adminApi.js';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {

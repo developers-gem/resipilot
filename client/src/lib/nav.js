@@ -16,7 +16,7 @@ export const NAV = [
   { section: 'OPERATIONS', items: [
     { to: '/facilities',   label: 'Facilities',         icon: 'ti-building' },
     { to: '/staff',        label: 'Staff',              icon: 'ti-id-badge' },
-        { to: '/training-courses',     label: 'Training courses',   icon: 'ti-certificate' },
+    { to: '/training-courses',     label: 'Training courses',   icon: 'ti-certificate' },
 
     { to: '/training',     label: 'Training & Certs',   icon: 'ti-certificate' },
     // { to: '/workload',     label: 'Tasks / Workload',   icon: 'ti-checklist' },
@@ -30,10 +30,50 @@ export const NAV = [
     // { to: '/outcomes',     label: 'Outcome Metrics',    icon: 'ti-chart-line' },
     // { to: '/court-report', label: 'Court Reports',      icon: 'ti-gavel' },
   ]},
-  { section: 'INTAKE / DISCHARGE', items: [
-    { to: '/discharge',    label: 'Discharge Planning', icon: 'ti-logout' },
-    { to: '/guardian-portal', label: 'Guardian Portal', icon: 'ti-user-heart' },
-  ]},
+ {
+  section: 'INTAKE / DISCHARGE',
+  items: [
+    {
+      to: '/guardian-portal',
+      label: 'Guardian Management',
+      icon: 'ti-user-heart'
+    }
+  ]
+},
+
+
+{
+  section: 'GUARDIAN PORTAL',
+  items: [
+    {
+      to: '/guardian',
+      label: 'Dashboard',
+      icon: 'ti-layout-dashboard'
+    },
+    {
+      to: '/guardian/children',
+      label: 'My Children',
+      icon: 'ti-users'
+    },
+    {
+      to: '/guardian/behavior',
+      label: 'Behavior Reports',
+      icon: 'ti-mood-confuzed'
+    },
+    {
+      to: '/guardian/visits',
+      label: 'Visits',
+      icon: 'ti-calendar-event'
+    },
+    {
+      to: '/guardian/messages',
+      label: 'Messages',
+      icon: 'ti-message'
+    },
+    
+  ]
+},
+
   { section: 'ACCOUNT', items: [
     { to: '/profile',      label: 'My Profile',         icon: 'ti-user-circle' },
     { to: '/settings',     label: 'Settings',           icon: 'ti-settings' },

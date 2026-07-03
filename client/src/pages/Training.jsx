@@ -5,7 +5,8 @@ import {
   Modal,
   Field,
 } from '../components/ui.jsx';
-import { api } from '../lib/api.js';
+import { adminApi as api } from '../lib/adminApi.js';
+
 
 export default function Training() {
   const certs = useResource('/certifications');

@@ -1,35 +1,62 @@
 // Lightweight UI helpers shared by all pages.
 import { useEffect, useState } from 'react';
-import { adminApi as api } from '../lib/adminApi.js';
+import { guardianApi as api } from '../lib/guardianApi.js';
 
 // Generic list page hook: GET /resource and expose CRUD helpers.
-export function useResource(path) {
+export function useResource(getPath, postPath = getPath) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
+
   async function refresh() {
+    if (!getPath) return;
+
     setLoading(true);
-    try { setItems(await api.get(path)); setErr(null); }
-    catch (e) { setErr(e.message); }
-    finally { setLoading(false); }
+
+    try {
+      setItems(await api.get(getPath));
+      setErr(null);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
-useEffect(() => {
-  if (!path) {
+
+ useEffect(() => {
+  if (!getPath) {
     setItems([]);
     setLoading(false);
     return;
   }
 
   refresh();
-  // eslint-disable-next-line
-}, [path]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [getPath]);
 
-return {
-    items, loading, err, refresh,
-    create: async (body) => { await api.post(path, body); refresh(); },
-    update: async (id, body) => { await api.patch(`${path}/${id}`, body); refresh(); },
-    remove: async (id) => { if (confirm('Delete this item?')) { await api.delete(`${path}/${id}`); refresh(); } },
+  return {
+    items,
+    loading,
+    err,
+    refresh,
+
+    create: async body => {
+      await api.post(postPath, body);
+      refresh();
+    },
+
+    update: async (id, body) => {
+      await api.patch(`${postPath}/${id}`, body);
+      refresh();
+    },
+
+    remove: async id => {
+      if (confirm('Delete this item?')) {
+        await api.delete(`${postPath}/${id}`);
+        refresh();
+      }
+    },
   };
 }
 

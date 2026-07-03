@@ -32,53 +32,167 @@ import GuardianPortal from './pages/GuardianPortal.jsx';
 import Profile from './pages/Profile.jsx';
 import Settings from './pages/Settings.jsx';
 import TrainingCourses from './pages/TrainingCourses.jsx';
+import GuardianDashboard from './pages/guardian/GuardianDashboard.jsx';
+
+import GuardianChildren from './pages/guardian/Children.jsx';
+import GuardianBehavior from './pages/guardian/Behavior.jsx';
+import GuardianVisits from './pages/guardian/Visits.jsx';
+import GuardianMessages from './pages/guardian/Messages.jsx';
+
+import GuardianLogin from './pages/GuardianLogin.jsx';
+import GuardianProtected from './components/GuardianProtected.jsx';
+import { GuardianAuthProvider } from './lib/guardianAuth.jsx';
+
+import GuardianApp from './GuardianApp.jsx';
+
+import SuperAdminApp from './SuperAdminApp.jsx';
+
+import SuperAdminDashboard from './pages/super-admin/Dashboard.jsx';
+import SuperAdminFacilities from './pages/super-admin/Facilities.jsx';
+import SuperAdminFacilityAdmins from './pages/super-admin/FacilityAdmins.jsx';
+
+import { SuperAdminAuthProvider } from './lib/superAdminAuth.jsx';
+
+import { useSuperAdminAuth } from './lib/superAdminAuth.jsx';
+
+import SuperAdminLogin from './pages/SuperAdminLogin.jsx';
+
+import PlatformBilling from './pages/super-admin/PlatformBilling.jsx';
+
+import Plans from './pages/super-admin/plans.jsx';
 
 function Protected({ children }) {
+
   const { user, loading } = useAuth();
   if (loading) return <div className="p">Loading…</div>;
   if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
+function SuperAdminProtected({ children }) {
+  const { admin, loading } = useSuperAdminAuth();
+
+  if (loading) {
+    return <div className="p">Loading…</div>;
+  }
+
+  if (!admin) {
+    return <Navigate to="/super-admin/login" replace />;
+  }
+
+  return children;
+}
+
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<Protected><App /></Protected>}>
-            <Route index element={<Dashboard />} />
-            <Route path="search" element={<Search />} />
-            <Route path="notifications" element={<Notifications />} />
-            <Route path="residents" element={<Residents />} />
-            <Route path="residents/:id" element={<ResidentDetail />} />
-            <Route path="mar" element={<Mar />} />
-            <Route path="behavioral" element={<Behavioral />} />
-            <Route path="bip" element={<Bip />} />
-            <Route path="incidents" element={<Incidents />} />
-            <Route path="appointments" element={<Appointments />} />
-            <Route path="facilities" element={<Facilities />} />
-            <Route path="staff" element={<Staff />} />
-            <Route path="training" element={<Training />} />
-            <Route path="workload" element={<Workload />} />
-            <Route path="handoff" element={<Handoff />} />
-            <Route path="documents" element={<Documents />} />
-            <Route path="licensing" element={<Licensing />} />
-            <Route path="hipaa" element={<Hipaa />} />
-            <Route path="audit" element={<Audit />} />
-            <Route path="outcomes" element={<Outcomes />} />
-            <Route path="court-report" element={<CourtReport />} />
-            <Route path="discharge" element={<Discharge />} />
-            <Route path="guardian-portal" element={<GuardianPortal />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="settings" element={<Settings />} />
-            <Route
-              path="/training-courses"
-              element={<TrainingCourses />}
-            />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <GuardianAuthProvider>
+        <SuperAdminAuthProvider>
+
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+
+              <Route
+                path="/guardian-login"
+                element={<GuardianLogin />}
+              />
+              <Route
+                path="/super-admin/login"
+                element={<SuperAdminLogin />}
+              />
+
+              <Route element={<Protected><App /></Protected>}>
+
+                <Route index element={<Dashboard />} />
+                <Route path="search" element={<Search />} />
+                <Route path="notifications" element={<Notifications />} />
+                <Route path="residents" element={<Residents />} />
+                <Route path="residents/:id" element={<ResidentDetail />} />
+                <Route path="mar" element={<Mar />} />
+                <Route path="behavioral" element={<Behavioral />} />
+                <Route path="bip" element={<Bip />} />
+                <Route path="incidents" element={<Incidents />} />
+                <Route path="appointments" element={<Appointments />} />
+                <Route path="facilities" element={<Facilities />} />
+                <Route path="staff" element={<Staff />} />
+                <Route path="training" element={<Training />} />
+                <Route path="workload" element={<Workload />} />
+                <Route path="handoff" element={<Handoff />} />
+                <Route path="documents" element={<Documents />} />
+                <Route path="licensing" element={<Licensing />} />
+                <Route path="hipaa" element={<Hipaa />} />
+                <Route path="audit" element={<Audit />} />
+                <Route path="outcomes" element={<Outcomes />} />
+                <Route path="court-report" element={<CourtReport />} />
+                <Route path="discharge" element={<Discharge />} />
+                <Route path="guardian-portal" element={<GuardianPortal />} />
+
+
+
+                <Route path="profile" element={<Profile />} />
+                <Route path="settings" element={<Settings />} />
+                <Route
+                  path="training-courses"
+                  element={<TrainingCourses />}
+                />
+              </Route>
+
+
+              <Route
+                element={
+                  <GuardianProtected>
+                    <GuardianApp />
+                  </GuardianProtected>
+                }
+              >
+                <Route path="guardian" element={<GuardianDashboard />} />
+                <Route path="guardian/children" element={<GuardianChildren />} />
+                <Route path="guardian/behavior" element={<GuardianBehavior />} />
+                <Route path="guardian/visits" element={<GuardianVisits />} />
+                <Route path="guardian/messages" element={<GuardianMessages />} />
+              </Route>
+
+              <Route
+                element={
+                  <SuperAdminProtected>
+                    <SuperAdminApp />
+                  </SuperAdminProtected>
+                }
+              >
+                <Route
+                  path="/super-admin"
+                  element={<SuperAdminDashboard />}
+                />
+
+                <Route
+                  path="/super-admin/facilities"
+                  element={<SuperAdminFacilities />}
+                />
+
+                <Route
+                  path="/super-admin/facility-admins"
+                  element={<SuperAdminFacilityAdmins />}
+                />
+
+                <Route
+                  path="/super-admin/plans"
+                  element={<Plans />}
+                />
+                <Route
+                  path="/super-admin/platform-billing"
+                  element={<PlatformBilling />}
+                />
+
+
+              </Route>
+
+            </Routes>
+
+          </BrowserRouter>
+        </SuperAdminAuthProvider>
+      </GuardianAuthProvider>
+
     </AuthProvider>
   </React.StrictMode>
 );
