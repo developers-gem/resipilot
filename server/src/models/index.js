@@ -4,6 +4,10 @@ const { Schema, model } = mongoose;
 const opts = { timestamps: true };
 const ref = (m) => ({ type: Schema.Types.ObjectId, ref: m });
 
+
+export { default as SuperAdmin } from './SuperAdmin.js';
+
+
 // ---------- USERS ----------
 const UserSchema = new Schema({
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },

@@ -34,7 +34,6 @@ const GuardianSchema = new Schema({
     required: true
   },
 
-  email: String,
 
   phone: {
     type: String,
@@ -77,7 +76,21 @@ const GuardianSchema = new Schema({
   active: {
     type: Boolean,
     default: true
-  }
+  },
+
+ email: {
+  type: String,
+  required: true,
+  unique: true,
+  lowercase: true,
+  trim: true,
+},
+
+
+passwordHash: {
+  type: String,
+  required: true,
+},
 
 }, { timestamps: true });
 

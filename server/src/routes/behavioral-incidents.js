@@ -1,14 +1,13 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, requireGuardian } from '../middleware/auth.js';
 import { BehavioralIncident } from '../models/index.js';
 
 const router = Router();
 
-router.use(requireAuth);
 
 // GET ALL
 
-router.get('/', async (req, res, next) => {
+router.get('/', requireAuth, async (req, res, next) => {
   try {
     const incidents = await BehavioralIncident.find()
       .populate('resident')
@@ -21,9 +20,29 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+
+// GET INCIDENTS FOR A RESIDENT
+
+router.get('/resident/:residentId', requireGuardian, async (req, res, next) => {
+  try {
+    console.log('Route resident ID:', req.params.residentId);
+
+    const incidents = await BehavioralIncident.find({
+      resident: req.params.residentId,
+    })
+    
+      .populate('resident')
+      .populate('reportedBy')
+      .sort('-occurredAt');
+
+    res.json(incidents);
+  } catch (e) {
+    next(e);
+  }
+});
 // GET ONE
 
-router.get('/:id', async (req, res, next) => {
+router.get('/:id', requireAuth, async (req, res, next) => {
   try {
     const incident = await BehavioralIncident.findById(
       req.params.id
@@ -45,7 +64,7 @@ router.get('/:id', async (req, res, next) => {
 
 // CREATE
 
-router.post('/', async (req, res, next) => {
+router.post('/', requireAuth, async (req, res, next) => {
   try {
     const incident =
       await BehavioralIncident.create({
@@ -79,7 +98,7 @@ router.post('/', async (req, res, next) => {
 
 // UPDATE
 
-router.patch('/:id', async (req, res, next) => {
+router.patch('/:id', requireAuth, async (req, res, next) => {
   try {
     const incident =
       await BehavioralIncident.findByIdAndUpdate(
@@ -107,7 +126,7 @@ router.patch('/:id', async (req, res, next) => {
 
 // DELETE
 
-router.delete('/:id', async (req, res, next) => {
+router.delete('/:id', requireAuth, async (req, res, next) => {
   try {
     const incident =
       await BehavioralIncident.findByIdAndDelete(

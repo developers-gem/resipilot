@@ -14,21 +14,28 @@ const GuardianMessageSchema = new Schema(
       required: true,
     },
 
-    message: {
+    sender: {
       type: String,
+      enum: ['Guardian', 'Staff'],
       required: true,
     },
 
-    direction: {
+    message: {
       type: String,
-      enum: ['Incoming', 'Outgoing'],
-      default: 'Outgoing',
+      required: true,
+      trim: true,
     },
+
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+
+    readAt: Date,
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-export default model(
-  'GuardianMessage',
-  GuardianMessageSchema
-);
+export default model('GuardianMessage', GuardianMessageSchema);

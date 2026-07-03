@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import express from 'express';
 import Guardian from '../models/Guardian.js';
 
@@ -29,7 +30,14 @@ router.get('/', async (req, res, next) => {
  */
 router.post('/', async (req, res, next) => {
   try {
-    const item = await Guardian.create(req.body);
+    const { password, ...guardianData } = req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const item = await Guardian.create({
+      ...guardianData,
+      passwordHash,
+    });
 
     const populated = await Guardian.findById(item._id)
       .populate({
@@ -37,8 +45,8 @@ router.post('/', async (req, res, next) => {
         select: 'firstName lastName facility',
         populate: {
           path: 'facility',
-          select: 'name city state'
-        }
+          select: 'name city state',
+        },
       });
 
     res.status(201).json(populated);

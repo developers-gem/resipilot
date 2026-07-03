@@ -16,12 +16,17 @@ import appointments from './routes/appointments.js';
 import behavioralRoutes from './routes/behavioral-incidents.js';
 import visitRoutes from './routes/visits.js';
 import guardianMessageRoutes from './routes/guardianMessages.js';
+import guardianAuthRoutes from './routes/guardianAuth.js';
+import superAdminAuthRoutes from './routes/superAdminAuth.js';
 
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
 app.use(express.json({ limit: '5mb' }));
-
+app.use(
+  '/api/super-admin-auth',
+  superAdminAuthRoutes
+);
 app.use('/uploads', express.static('uploads'));
 
 app.use(morgan('dev'));
@@ -29,14 +34,14 @@ app.use(morgan('dev'));
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
 app.use('/api/auth', authRoutes);
-
+app.use('/api/guardian-auth', guardianAuthRoutes);
 // Auto-generate CRUD routes for every model
 const resourceMap = {
   'facilities':            Models.Facility,
   'residents':             Models.Resident,
   'medications':           Models.Medication,
   'mar':                   Models.MarEntry,
-  'behavioral-incidents':  Models.BehavioralIncident,
+  // 'behavioral-incidents':  Models.BehavioralIncident,
   'incident-reports':      Models.IncidentReport,
   'notifications':         Models.Notification,
   'tasks':                 Models.Task,
