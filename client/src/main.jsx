@@ -59,7 +59,7 @@ import SuperAdminLogin from './pages/SuperAdminLogin.jsx';
 
 import PlatformBilling from './pages/super-admin/PlatformBilling.jsx';
 
-import Plans from './pages/super-admin/plans.jsx';
+import Plans from './pages/super-admin/Plans.jsx'
 
 function Protected({ children }) {
 
@@ -175,16 +175,16 @@ createRoot(document.getElementById('root')).render(
                   element={<SuperAdminFacilityAdmins />}
                 />
 
-                <Route
-                  path="/super-admin/plans"
-                  element={<Plans />}
-                />
+
                 <Route
                   path="/super-admin/platform-billing"
                   element={<PlatformBilling />}
                 />
 
-
+                <Route
+                  path="/super-admin/plans"
+                  element={<Plans />}
+                />
               </Route>
 
             </Routes>

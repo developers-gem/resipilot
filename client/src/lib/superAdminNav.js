@@ -45,48 +45,16 @@ export const SUPER_ADMIN_NAV = [
         label: 'Platform Billing',
         icon: 'ti-receipt',
       },
-      // {
-      //   to: '/super-admin/payments',
-      //   label: 'Payments',
-      //   icon: 'ti-currency-dollar',
-      // },
-      // {
-      //   to: '/super-admin/coupons',
-      //   label: 'Coupons',
-      //   icon: 'ti-ticket',
-      // },
+      {
+        to: '/super-admin/payments',
+        label: 'Payments',
+        icon: 'ti-currency-dollar',
+      },
+      
     ],
   },
 
-  // {
-  //   section: 'SUPPORT',
-  //   items: [
-  //     {
-  //       to: '/super-admin/support',
-  //       label: 'Support Tickets',
-  //       icon: 'ti-headset',
-  //     },
-  //     {
-  //       to: '/super-admin/announcements',
-  //       label: 'Announcements',
-  //       icon: 'ti-speakerphone',
-  //     },
-  //   ],
-  // },
+  
 
-  // {
-  //   section: 'SYSTEM',
-  //   items: [
-  //     {
-  //       to: '/super-admin/audit',
-  //       label: 'Audit Logs',
-  //       icon: 'ti-history',
-  //     },
-  //     {
-  //       to: '/super-admin/settings',
-  //       label: 'Settings',
-  //       icon: 'ti-settings',
-  //     },
-  //   ],
-  // },
+ 
 ];
