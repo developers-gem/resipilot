@@ -1,10 +1,13 @@
 // Lightweight UI helpers shared by all pages.
 import { useEffect, useState } from 'react';
-import { adminApi as api } from '../lib/adminApi.js';
+import { adminApi  } from '../lib/adminApi.js';
 
 // Generic list page hook: GET /resource and expose CRUD helpers.
-export function useResource(path) {
-  const [items, setItems] = useState([]);
+export function useResource(
+  path,
+  api = adminApi
+) {
+    const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
   async function refresh() {

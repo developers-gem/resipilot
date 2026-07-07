@@ -3,7 +3,12 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App.jsx';
 import Login from './pages/Login.jsx';
-import { AuthProvider, useAuth } from './lib/auth.jsx';
+import {
+  FacilityAuthProvider,
+  useFacilityAuth,
+} from './lib/facilityAuth.jsx';
+
+import FacilityProtected from './components/FacilityProtected.jsx';
 import './styles.css';
 
 import Dashboard from './pages/Dashboard.jsx';
@@ -60,14 +65,15 @@ import SuperAdminLogin from './pages/SuperAdminLogin.jsx';
 import PlatformBilling from './pages/super-admin/PlatformBilling.jsx';
 
 import Plans from './pages/super-admin/Plans.jsx'
+import BillingDashboard from './pages/billing/Dashboard.jsx';
+import BillingResidents from './pages/billing/Residents.jsx';
+// function Protected({ children }) {
 
-function Protected({ children }) {
-
-  const { user, loading } = useAuth();
-  if (loading) return <div className="p">Loading…</div>;
-  if (!user) return <Navigate to="/login" replace />;
-  return children;
-}
+//   const { user, loading } = useAuth();
+//   if (loading) return <div className="p">Loading…</div>;
+//   if (!user) return <Navigate to="/login" replace />;
+//   return children;
+// }
 
 function SuperAdminProtected({ children }) {
   const { admin, loading } = useSuperAdminAuth();
@@ -85,7 +91,7 @@ function SuperAdminProtected({ children }) {
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
+    <FacilityAuthProvider>
       <GuardianAuthProvider>
         <SuperAdminAuthProvider>
 
@@ -102,7 +108,22 @@ createRoot(document.getElementById('root')).render(
                 element={<SuperAdminLogin />}
               />
 
-              <Route element={<Protected><App /></Protected>}>
+              <Route
+                element={
+                  <FacilityProtected>
+                    <App />
+                  </FacilityProtected>
+                }
+              >
+                <Route
+  path="billing"
+  element={<BillingDashboard />}
+/>
+
+<Route
+  path="billing/residents"
+  element={<BillingResidents />}
+/>
 
                 <Route index element={<Dashboard />} />
                 <Route path="search" element={<Search />} />
@@ -192,7 +213,6 @@ createRoot(document.getElementById('root')).render(
           </BrowserRouter>
         </SuperAdminAuthProvider>
       </GuardianAuthProvider>
-
-    </AuthProvider>
+    </FacilityAuthProvider>
   </React.StrictMode>
 );

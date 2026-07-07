@@ -5,9 +5,19 @@ import {
   Modal,
   Field,
 } from "../../components/ui.jsx";
+import { superAdminApi } from '../../lib/superAdminApi.js';
+
 export default function Facilities() {
-  const { items, create, remove } = useResource('/facilities');
-  const [showAdd, setShowAdd] = useState(false);
+const {
+  items,
+  create,
+  remove,
+} = useResource(
+  '/facilities',
+  superAdminApi
+);
+
+const [showAdd, setShowAdd] = useState(false);
   return (
     <>
       <PageHeader title="Facilities" actions={

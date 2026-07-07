@@ -119,7 +119,7 @@ function AddFacility({ onSave, onClose }) {
               })
             }
           >            <i className="ti ti-building-community" />
-           Create Customer Account
+           Create Facility
           </button>
         </>
       }
@@ -138,20 +138,29 @@ function AddFacility({ onSave, onClose }) {
             value={d.type}
             onChange={e => setD({ ...d, type: e.target.value })}
           >
-            <option value="STRTP">Group Home (Licensed) — RCFE/GH
-            </option>
+            <option value="GROUP_HOME">
+  Group Home
+</option>
 
-            <option value="FFA">Foster family agency (FFA)</option>
-            <option value="STRTP">Short-Term Residential Therapeutic Program (STRTP)
-            </option>
-            <option value="STRTP">Transitional Housing Program (THP-NMD)
-            </option>
+<option value="FFA">
+  Foster Family Agency
+</option>
 
-            <option value="STRTP">Emergency Shelter
-            </option>
+<option value="STRTP">
+  Short-Term Residential Therapeutic Program
+</option>
 
-            <option value="STRTP">Satellite Facility
-            </option>
+<option value="THP">
+  Transitional Housing Program
+</option>
+
+<option value="EMERGENCY">
+  Emergency Shelter
+</option>
+
+<option value="SATELLITE">
+  Satellite Facility
+</option>
 
           </select>
         </Field>
@@ -210,6 +219,8 @@ function AddFacility({ onSave, onClose }) {
       <option>Trial</option>
       <option>Active</option>
       <option>Suspended</option>
+            <option>Cancelled</option>
+
     </select>
   </Field>
 
@@ -274,7 +285,7 @@ function AddFacility({ onSave, onClose }) {
     />
   </Field>
 
-  <Field label="Temporary Password">
+  <Field label="Initial Password">
     <input
       type="password"
       value={d.adminPassword}

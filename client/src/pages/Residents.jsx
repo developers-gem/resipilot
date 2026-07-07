@@ -1,18 +1,26 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useResource, PageHeader, Modal, Field } from '../components/ui.jsx';
+import { useFacilityAuth } from '../lib/facilityAuth.jsx';
 
 export default function Residents() {
+  const { admin } = useFacilityAuth();
   const { items, create, remove, loading } = useResource('/residents');
-  const facilities = useResource('/facilities').items;
-
   const [showAdd, setShowAdd] = useState(false);
   const [search, setSearch] = useState('');
-
-  const filtered = items.filter(r =>
+  const filtered = items.filter(r => {
+  const matchesSearch =
     !search ||
-    `${r.firstName} ${r.lastName}`.toLowerCase().includes(search.toLowerCase())
-  );
+    `${r.firstName} ${r.lastName}`
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+  const sameFacility =
+    r.facility === admin?.facility?._id ||
+    r.facility?._id === admin?.facility?._id;
+
+  return matchesSearch && sameFacility;
+});
 
   return (
     <>
@@ -50,278 +58,121 @@ export default function Residents() {
           gap: 14
         }}
       >
-        {facilities.map(facility => {
-          const residents = filtered.filter(
-            r => r.facility === facility._id
-          );
+       
 
-          if (residents.length === 0) return null;
+       <div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(260px,1fr))',
+    gap: 14,
+  }}
+>
+  {filtered.map(r => (
+    <div
+      key={r._id}
+      style={{
+        background: '#fff',
+        border:
+          r.riskLevel === 'high'
+            ? '2px solid #ef4444'
+            : r.riskLevel === 'moderate'
+            ? '2px solid #f59e0b'
+            : '2px solid #22c55e',
+        borderRadius: 18,
+        padding: 16,
+        position: 'relative',
+        boxShadow: '0 2px 8px rgba(0,0,0,.05)',
+      }}
+    >
+      <button
+        className="btn sm ghost"
+        onClick={() => remove(r._id)}
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 10,
+        }}
+      >
+        <i className="ti ti-trash" />
+      </button>
 
-          return (
-            <div
-              key={facility._id}
-              style={{
-                background: '#fff',
-                border: '1px solid var(--bdr)',
-                borderRadius: 18,
-                padding: 12
-              }}
-            >
-              {/* FACILITY HEADER */}
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: 18
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: 12,
-                      background: '#edf4ff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#1f5eff'
-                    }}
-                  >
-                    <i className="ti ti-home" />
-                  </div>
+      <div
+        style={{
+          width: 44,
+          height: 44,
+          borderRadius: '50%',
+          background: '#edf4ff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 700,
+          marginBottom: 14,
+        }}
+      >
+        {r.firstName?.[0]}
+        {r.lastName?.[0]}
+      </div>
 
-                  <div>
-                    <div
-                      style={{
-                        fontSize: 15,
-                        fontWeight: 700
-                      }}
-                    >
-                      {facility.name}
-                    </div>
+      <Link
+        to={`/residents/${r._id}`}
+        style={{
+          fontWeight: 700,
+          fontSize: 18,
+          textDecoration: 'none',
+          color: '#111',
+        }}
+      >
+        {r.firstName} {r.lastName}
+      </Link>
 
-                    <div
-                      style={{
-                        color: 'var(--tx3)',
-                        fontSize: 13,
-                        marginTop: 3
-                      }}
-                    >
-                      {residents.length} residents ·{' '}
-                      {facility.capacity || 0} bed capacity
-                    </div>
-                  </div>
-                </div>
+      <div
+        style={{
+          color: 'var(--tx3)',
+          marginTop: 6,
+        }}
+      >
+        DOB: {r.dateOfBirth?.slice(0, 10)}
+      </div>
 
-                <div
-                  style={{
-                    background: '#eef5ff',
-                    color: '#1f5eff',
-                    padding: '8px 14px',
-                    borderRadius: 999,
-                    fontSize: 13,
-                    fontWeight: 600
-                  }}
-                >
-                  {facility.manager || 'No manager'}
-                </div>
-              </div>
+      <div style={{ marginTop: 14 }}>
+        <strong>Room:</strong> {r.roomNumber || '—'}
+      </div>
 
-              {/* RESIDENT CARDS */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns:
-                    'repeat(auto-fill, minmax(180px, 1fr))',
-                  gap: 10
-                }}
-              >
-                {residents.map(r => (
-                  <div
-                    key={r._id}
-                    style={{
-                      background: '#fff',
-                      border:
-                        r.riskLevel === 'high'
-                          ? '2px solid #ef4444'
-                          : r.riskLevel === 'moderate'
-                            ? '2px solid #f59e0b'
-                            : '2px solid #22c55e',
-                      borderRadius: 18,
-                      padding: 4,
-                      position: 'relative',
-                      boxShadow:
-                        '0 2px 8px rgba(0,0,0,0.04)'
-                    }}
-                  >
-                    <button
-                      className="btn sm ghost"
-                      onClick={() => remove(r._id)}
-                      style={{
-                        position: 'absolute',
-                        top: 10,
-                        right: 10
-                      }}
-                    >
-                      <i className="ti ti-trash" />
-                    </button>
+      <div>
+        <strong>Risk:</strong> {r.riskLevel}
+      </div>
 
-                    {/* AVATAR */}
-                    <div
-                      style={{
-                        width: 42,
-                        height: 42,
-                        borderRadius: '50%',
-                        background:
-                          r.riskLevel === 'high'
-                            ? '#fee2e2'
-                            : r.riskLevel === 'moderate'
-                              ? '#fef3c7'
-                              : '#dcfce7',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: 18,
-                        marginBottom: 14
-                      }}
-                    >
-                      {r.firstName?.[0]}
-                      {r.lastName?.[0]}
-                    </div>
+      <div>
+        <strong>Status:</strong> {r.isActive ? 'Active' : 'Inactive'}
+      </div>
+    </div>
+  ))}
+</div>
 
-                    {/* NAME */}
-                    <Link
-                      to={`/residents/${r._id}`}
-                      style={{
-                        fontSize: 20,
-                        fontWeight: 700,
-                        color: '#111',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      {r.firstName} {r.lastName}
-                    </Link>
 
-                    <div
-                      style={{
-                        color: 'var(--tx3)',
-                        marginTop: 6,
-                        fontSize: 14
-                      }}
-                    >
-                      DOB: {r.dateOfBirth?.slice(0, 10)}
-                    </div>
 
-                    {/* STATS */}
-                    <div
-                      style={{
-                        marginTop: 18,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 10,
-                        fontSize: 14
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between'
-                        }}
-                      >
-                        <span style={{ color: 'var(--tx3)' }}>
-                          Room
-                        </span>
-
-                        <strong>{r.roomNumber || '—'}</strong>
-                      </div>
-
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between'
-                        }}
-                      >
-                        <span style={{ color: 'var(--tx3)' }}>
-                          Risk
-                        </span>
-
-                        <strong>
-                          {r.riskLevel}
-                        </strong>
-                      </div>
-
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between'
-                        }}
-                      >
-                        <span style={{ color: 'var(--tx3)' }}>
-                          Status
-                        </span>
-
-                        <strong>
-                          {r.isActive ? 'Active' : 'Inactive'}
-                        </strong>
-                      </div>
-                    </div>
-
-                    {/* BADGES */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: 8,
-                        flexWrap: 'wrap',
-                        marginTop: 18
-                      }}
-                    >
-                      <span
-                        className={`badge ${r.riskLevel === 'high'
-                            ? 'red'
-                            : r.riskLevel === 'moderate'
-                              ? 'amber'
-                              : 'green'
-                          }`}
-                      >
-                        {r.riskLevel} risk
-                      </span>
-
-                      <span className="badge blue">
-                        Intake
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
       </div>
 
       {showAdd && (
-        <AddResidentModal
-          facilities={facilities}
-          onClose={() => setShowAdd(false)}
-          onSave={async d => {
-            await create(d);
-            setShowAdd(false);
-          }}
-        />
+       <AddResidentModal
+  admin={admin}
+  onClose={() => setShowAdd(false)}
+  onSave={async d => {
+    await create(d);
+    setShowAdd(false);
+  }}
+/>
       )}
     </>
   );
 }
 
-function AddResidentModal({ facilities, onSave, onClose }) {
+function AddResidentModal({
+  admin,
+  onSave,
+  onClose,
+})
+{
   const [step, setStep] = useState(1);
 
   const [d, setD] = useState({
@@ -337,7 +188,7 @@ function AddResidentModal({ facilities, onSave, onClose }) {
     placementReason: '',
 
     // STEP 2
-    facility: facilities[0]?._id || '',
+facility: admin?.facility?._id || '',
     roomNumber: '',
     placementDate: '',
     placementType: 'Emergency',
@@ -440,7 +291,7 @@ function AddResidentModal({ facilities, onSave, onClose }) {
                 onChange={e =>
                   setD({ ...d, lastName: e.target.value })
                 }
-              /> 
+              />
             </Field>
           </div>
           <Field label="Preferred name">
@@ -541,19 +392,11 @@ function AddResidentModal({ facilities, onSave, onClose }) {
         <>
           <div className="grid cols-2">
             <Field label="Facility">
-              <select
-                value={d.facility}
-                onChange={e =>
-                  setD({ ...d, facility: e.target.value })
-                }
-              >
-                {facilities.map(f => (
-                  <option key={f._id} value={f._id}>
-                    {f.name}
-                  </option>
-                ))}
-              </select>
-            </Field>
+  <input
+    value={admin?.facility?.name || ''}
+    readOnly
+  />
+</Field>
 
             <Field label="Room / bed">
               <input
@@ -881,8 +724,7 @@ function AddResidentModal({ facilities, onSave, onClose }) {
             <div className="card">
               <h4>Placement</h4>
               <p>
-                <strong>Facility:</strong>{' '}
-                {facilities.find(f => f._id === d.facility)?.name}
+               <strong>Facility:</strong> {admin?.facility?.name}
               </p>
               <p>
                 <strong>Room:</strong> {d.roomNumber}

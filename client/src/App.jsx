@@ -1,9 +1,9 @@
 import { Link, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from './lib/auth.jsx';
+import { useFacilityAuth } from './lib/facilityAuth.jsx';
 import { NAV } from './lib/nav.js';
 
 export default function App() {
-  const { user, logout } = useAuth();
+  const { admin, logout } = useFacilityAuth();
   const nav = useNavigate();
   const loc = useLocation();
   const title = NAV.flatMap(s => s.items).find(i => i.to === loc.pathname)?.label
@@ -36,10 +36,23 @@ export default function App() {
           </div>
         ))}
         <div className="sb-user">
-          <div className="sb-avatar">{(user?.fullName || 'U').slice(0,1).toUpperCase()}</div>
+<div className="sb-avatar">
+  {(admin?.firstName || 'U').slice(0,1).toUpperCase()}
+</div>
           <div>
-            <div style={{ fontWeight: 500 }}>{user?.fullName}</div>
-            <div style={{ color: 'var(--tx3)', fontSize: 10 }}>{(user?.roles || []).join(', ')}</div>
+<div style={{ fontWeight: 500 }}>
+  {admin
+    ? `${admin.firstName} ${admin.lastName}`
+    : ''}
+</div>          
+<div
+  style={{
+    color: 'var(--tx3)',
+    fontSize: 10,
+  }}
+>
+  Facility Administrator
+</div>
           </div>
           <button className="sb-logout" onClick={() => { logout(); nav('/login'); }} title="Sign out">
             <i className="ti ti-logout" />

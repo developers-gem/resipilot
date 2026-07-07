@@ -6,12 +6,11 @@ import {
   useNavigate,
 } from 'react-router-dom';
 
-import { useAuth } from './lib/auth.jsx';
+import { useSuperAdminAuth } from './lib/superAdminAuth.jsx';
 import { SUPER_ADMIN_NAV } from './lib/superAdminNav.js';
 
 export default function SuperAdminApp() {
-  const { user, logout } = useAuth();
-
+  const { admin, logout } = useSuperAdminAuth();
   const nav = useNavigate();
   const loc = useLocation();
 
@@ -63,12 +62,14 @@ export default function SuperAdminApp() {
 
         <div className="sb-user">
           <div className="sb-avatar">
-            {(user?.name?.[0] || 'S').toUpperCase()}
+            {(admin?.firstName?.[0] || 'S').toUpperCase()}
           </div>
 
           <div>
             <div style={{ fontWeight: 600 }}>
-              {user?.name || 'Super Admin'}
+              {admin
+                ? `${admin.firstName} ${admin.lastName}`
+                : 'Super Admin'}
             </div>
 
             <div

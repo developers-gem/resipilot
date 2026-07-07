@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../lib/auth.jsx';
+import { useFacilityAuth } from '../lib/facilityAuth.jsx';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login } = useFacilityAuth();
   const nav = useNavigate();
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('admin123');
