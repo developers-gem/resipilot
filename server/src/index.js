@@ -18,7 +18,10 @@ import visitRoutes from './routes/visits.js';
 import guardianMessageRoutes from './routes/guardianMessages.js';
 import guardianAuthRoutes from './routes/guardianAuth.js';
 import superAdminAuthRoutes from './routes/superAdminAuth.js';
-
+import facilityAuthRoutes from './routes/facilityAuth.js';
+import facilityRoutes from './routes/facilities.js';
+import billingRoutes from './routes/billing.js';
+import billingResidentsRoutes from './routes/billingResidents.js';
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
@@ -35,13 +38,31 @@ app.get('/api/health', (_req, res) => res.json({ ok: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/guardian-auth', guardianAuthRoutes);
+
+app.use(
+  '/api/facility-auth',
+  facilityAuthRoutes
+);
+
+app.use(
+  '/api/billing',
+  billingRoutes
+);
+
+app.use(
+  '/api/billing/residents',
+  billingResidentsRoutes
+);
+
+app.use('/api/facilities', facilityRoutes);
+
+
+
 // Auto-generate CRUD routes for every model
 const resourceMap = {
-  'facilities':            Models.Facility,
   'residents':             Models.Resident,
   'medications':           Models.Medication,
   'mar':                   Models.MarEntry,
-  // 'behavioral-incidents':  Models.BehavioralIncident,
   'incident-reports':      Models.IncidentReport,
   'notifications':         Models.Notification,
   'tasks':                 Models.Task,

@@ -3,6 +3,8 @@ import { User } from '../models/index.js';
 import Guardian from '../models/Guardian.js';
 
 import SuperAdmin from '../models/SuperAdmin.js';
+import FacilityAdmin from '../models/FacilityAdmin.js';
+
 
 export async function requireAuth(req, res, next) {
   try {
@@ -123,5 +125,46 @@ export async function requireSuperAdmin(
     return res.status(401).json({
       error: 'Invalid token',
     });
+  }
+}
+
+export async function requireFacilityAdmin(
+  req,
+  res,
+  next
+) {
+  try {
+    const auth = req.headers.authorization;
+
+    if (!auth?.startsWith('Bearer ')) {
+      return res
+        .status(401)
+        .json({ error: 'Unauthorized' });
+    }
+
+    const token = auth.split(' ')[1];
+
+    const payload = jwt.verify(
+      token,
+      process.env.JWT_SECRET
+    );
+
+    const admin = await FacilityAdmin.findById(
+      payload.sub
+    ).populate('facility');
+
+    if (!admin || !admin.active) {
+      return res
+        .status(401)
+        .json({ error: 'Unauthorized' });
+    }
+
+    req.facilityAdmin = admin;
+
+    next();
+  } catch (err) {
+    return res
+      .status(401)
+      .json({ error: 'Unauthorized' });
   }
 }
