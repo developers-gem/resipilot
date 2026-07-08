@@ -26,7 +26,7 @@ import billingServicesRoutes from './routes/billingServices.js';
 import billingServiceLogsRoutes from './routes/billingServiceLogs.js';
 import payerRoutes from './routes/payers.js';
 import billingInvoicesRoutes from './routes/billingInvoices.js';
-
+import billingPaymentsRoutes from './routes/billingPayments.js';
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
@@ -73,6 +73,12 @@ app.use(
   '/api/billing/invoices',
   billingInvoicesRoutes
 );
+
+app.use(
+  '/api/billing/payments',
+  billingPaymentsRoutes
+);
+
 
 app.use('/api/billing/payers', payerRoutes);
 

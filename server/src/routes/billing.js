@@ -18,59 +18,72 @@ router.use(requireFacilityAdmin);
 
 router.get('/dashboard', async (req, res, next) => {
   try {
-    const facilityId = req.facilityAdmin.facility;
+    const facility = req.facilityAdmin.facility;
 
-    const activeResidents = await Resident.countDocuments({
-      facility: facilityId,
-      isActive: true,
-    });
+    const { Resident, Invoice } = await import('../models/index.js');
 
-    const outstanding = await ServiceLog.aggregate([
-      {
-        $match: {
-          facility: facilityId,
-          status: { $ne: 'Billed' },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          total: {
-            $sum: '$amount',
-          },
-        },
-      },
-    ]);
+    const activeResidents =
+      await Resident.countDocuments({
+        facility,
+        isActive: true,
+      });
 
-    const billed = await ServiceLog.aggregate([
-      {
-        $match: {
-          facility: facilityId,
-          status: 'Billed',
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          total: {
-            $sum: '$amount',
-          },
-        },
-      },
-    ]);
+    const invoices = await Invoice.find({
+      facility,
+    })
+      .populate(
+        'resident',
+        'firstName lastName'
+      )
+      .sort('-createdAt')
+      .limit(5);
 
-    const overdue = await ServiceLog.countDocuments({
-      facility: facilityId,
-      status: 'Pending',
-    });
+    const outstandingAR = invoices.reduce(
+      (sum, inv) =>
+        sum + (inv.balance || 0),
+      0
+    );
+
+    const totalInvoiced = invoices.reduce(
+      (sum, inv) =>
+        sum + (inv.total || 0),
+      0
+    );
+
+    const overdueInvoices =
+      await Invoice.countDocuments({
+        facility,
+        status: 'Overdue',
+      });
 
     res.json({
       activeResidents,
-      outstanding:
-        outstanding[0]?.total || 0,
-      invoiced:
-        billed[0]?.total || 0,
-      overdueInvoices: overdue,
+
+      outstandingAR,
+
+      totalInvoiced,
+
+      overdueInvoices,
+
+      recentInvoices: invoices.map(inv => ({
+        _id: inv._id,
+
+        invoiceNumber:
+          inv.invoiceNumber,
+
+        residentName:
+          inv.resident
+            ? `${inv.resident.firstName} ${inv.resident.lastName}`
+            : '-',
+
+        amount: inv.total,
+
+        balance: inv.balance,
+
+        status: inv.status,
+
+        dueDate: inv.dueDate,
+      })),
     });
   } catch (err) {
     next(err);
