@@ -1,8 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { PageHeader } from '../../components/ui.jsx';
 import { facilityApi } from '../../lib/facilityApi.js';
 
 export default function BillingResidents() {
+  const navigate = useNavigate();
+
   const [residents, setResidents] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -27,9 +30,13 @@ export default function BillingResidents() {
 
   const filtered = residents.filter(r => {
     const name =
-      `${r.firstName} ${r.lastName}`.toLowerCase();
+      `${r.firstName} ${r.lastName}`
+        .toLowerCase()
+        .trim();
 
-    return name.includes(search.toLowerCase());
+    return name.includes(
+      search.toLowerCase().trim()
+    );
   });
 
   return (
@@ -37,7 +44,12 @@ export default function BillingResidents() {
       <PageHeader
         title="Billing Residents"
         actions={
-          <button className="btn primary">
+          <button
+            className="btn primary"
+            onClick={() =>
+              navigate('/residents')
+            }
+          >
             <i className="ti ti-plus" />
             Add Resident
           </button>
@@ -60,7 +72,14 @@ export default function BillingResidents() {
 
       <div className="card">
         {loading ? (
-          <div>Loading...</div>
+          <div
+            style={{
+              padding: 30,
+              textAlign: 'center',
+            }}
+          >
+            Loading residents...
+          </div>
         ) : (
           <table>
             <thead>
@@ -74,7 +93,7 @@ export default function BillingResidents() {
             </thead>
 
             <tbody>
-              {filtered.length === 0 && (
+              {filtered.length === 0 ? (
                 <tr>
                   <td
                     colSpan="5"
@@ -86,41 +105,51 @@ export default function BillingResidents() {
                     No residents found.
                   </td>
                 </tr>
+              ) : (
+                filtered.map(r => (
+                  <tr
+                    key={r._id}
+                    onClick={() =>
+                      navigate(
+                        `/billing/residents/${r._id}`
+                      )
+                    }
+                    style={{
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <td>
+                      {r.firstName} {r.lastName}
+                    </td>
+
+                    <td>
+                      {r.roomNumber || '-'}
+                    </td>
+
+                    <td>
+                      {r.medicaidId || '-'}
+                    </td>
+
+                    <td>
+                      {r.primaryPayer || '-'}
+                    </td>
+
+                    <td>
+                      <span
+                        className={`badge ${
+                          r.isActive
+                            ? 'green'
+                            : 'gray'
+                        }`}
+                      >
+                        {r.isActive
+                          ? 'Active'
+                          : 'Inactive'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
               )}
-
-              {filtered.map(r => (
-                <tr key={r._id}>
-                  <td>
-                    {r.firstName} {r.lastName}
-                  </td>
-
-                  <td>
-                    {r.roomNumber || '-'}
-                  </td>
-
-                  <td>
-                    {r.medicaidId || '-'}
-                  </td>
-
-                  <td>
-                    {r.primaryPayer || '-'}
-                  </td>
-
-                  <td>
-                    <span
-                      className={`badge ${
-                        r.isActive
-                          ? 'green'
-                          : 'gray'
-                      }`}
-                    >
-                      {r.isActive
-                        ? 'Active'
-                        : 'Inactive'}
-                    </span>
-                  </td>
-                </tr>
-              ))}
             </tbody>
           </table>
         )}

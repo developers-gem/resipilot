@@ -24,13 +24,13 @@ export const NAV = [
     { to: '/handoff',      label: 'Shift Handoff',      icon: 'ti-transfer' },
     { to: '/documents',    label: 'Documents Vault',    icon: 'ti-folder' },
   ]},
-  { section: 'COMPLIANCE', items: [
-    { to: '/licensing',    label: 'State Licensing',    icon: 'ti-license' },
-    { to: '/hipaa',        label: 'HIPAA Access Log',   icon: 'ti-shield-lock' },
-    { to: '/audit',        label: 'Audit Trail',        icon: 'ti-history' },
-    // { to: '/outcomes',     label: 'Outcome Metrics',    icon: 'ti-chart-line' },
-    // { to: '/court-report', label: 'Court Reports',      icon: 'ti-gavel' },
-  ]},
+  // { section: 'COMPLIANCE', items: [
+  //   { to: '/licensing',    label: 'State Licensing',    icon: 'ti-license' },
+  //   { to: '/hipaa',        label: 'HIPAA Access Log',   icon: 'ti-shield-lock' },
+  //   { to: '/audit',        label: 'Audit Trail',        icon: 'ti-history' },
+  //   { to: '/outcomes',     label: 'Outcome Metrics',    icon: 'ti-chart-line' },
+  //   { to: '/court-report', label: 'Court Reports',      icon: 'ti-gavel' },
+  // ]},
 
   {
   section: 'Billing',
@@ -42,11 +42,11 @@ export const NAV = [
       icon: 'ti-layout-dashboard',
     },
 
-    {
-      to: '/billing/residents',
-      label: 'Residents',
-      icon: 'ti-users',
-    },
+    // {
+    //   to: '/billing/residents',
+    //   label: 'Residents',
+    //   icon: 'ti-users',
+    // },
 
     {
       to: '/billing/services',

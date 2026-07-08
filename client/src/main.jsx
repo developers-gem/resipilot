@@ -66,14 +66,11 @@ import PlatformBilling from './pages/super-admin/PlatformBilling.jsx';
 
 import Plans from './pages/super-admin/Plans.jsx'
 import BillingDashboard from './pages/billing/Dashboard.jsx';
-import BillingResidents from './pages/billing/Residents.jsx';
-// function Protected({ children }) {
 
-//   const { user, loading } = useAuth();
-//   if (loading) return <div className="p">Loading…</div>;
-//   if (!user) return <Navigate to="/login" replace />;
-//   return children;
-// }
+import BillingServices from './pages/billing/Services.jsx';
+import ServiceLogs from './pages/billing/ServiceLogs.jsx';
+import BillingInvoices from './pages/billing/Invoices.jsx';
+
 
 function SuperAdminProtected({ children }) {
   const { admin, loading } = useSuperAdminAuth();
@@ -116,13 +113,26 @@ createRoot(document.getElementById('root')).render(
                 }
               >
                 <Route
-  path="billing"
-  element={<BillingDashboard />}
-/>
+                  path="billing"
+                  element={<BillingDashboard />}
+                />
 
-<Route
-  path="billing/residents"
-  element={<BillingResidents />}
+
+
+
+                <Route
+                  path="billing/services"
+                  element={<BillingServices />}
+                />
+
+                <Route
+                  path="billing/service-logs"
+                  element={<ServiceLogs />}
+                />
+
+                <Route
+  path="billing/invoices"
+  element={<BillingInvoices />}
 />
 
                 <Route index element={<Dashboard />} />
