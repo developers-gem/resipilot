@@ -98,33 +98,62 @@ export default function BillingDashboard() {
           </div>
         ) : (
           <table>
-            <thead>
-              <tr>
-                <th>Invoice</th>
-                <th>Resident</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
+  <thead>
+    <tr>
+      <th>Invoice #</th>
+      <th>Resident</th>
+      <th>Total</th>
+      <th>Balance</th>
+      <th>Status</th>
+    </tr>
+  </thead>
 
-            <tbody>
-              {stats.recentInvoices.map(inv => (
-                <tr key={inv._id}>
-                  <td>{inv.number}</td>
+  <tbody>
+    {stats.recentInvoices.map(inv => (
+      <tr key={inv._id}>
+        <td>{inv.invoiceNumber}</td>
 
-                  <td>
-                    {inv.residentName}
-                  </td>
+        <td>{inv.residentName}</td>
 
-                  <td>
-                    ${inv.amount}
-                  </td>
+        <td>
+          ${Number(inv.amount || 0).toFixed(2)}
+        </td>
 
-                  <td>{inv.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <td>
+          ${Number(inv.balance || 0).toFixed(2)}
+        </td>
+
+        <td>
+          <span
+            className={`badge ${
+              inv.status === 'Paid'
+                ? 'green'
+                : inv.status === 'Partial'
+                ? 'orange'
+                : 'gray'
+            }`}
+          >
+            {inv.status}
+          </span>
+        </td>
+      </tr>
+    ))}
+
+    {stats.recentInvoices.length === 0 && (
+      <tr>
+        <td
+          colSpan="5"
+          style={{
+            textAlign: 'center',
+            padding: 30,
+          }}
+        >
+          No invoices yet.
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
         )}
       </div>
     </>
