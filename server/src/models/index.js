@@ -4,9 +4,13 @@ const { Schema, model } = mongoose;
 const opts = { timestamps: true };
 const ref = (m) => ({ type: Schema.Types.ObjectId, ref: m });
 
+export { default as Invoice } from './Invoice.js';
 
 export { default as SuperAdmin } from './SuperAdmin.js';
-
+export { default as BillingService } from './BillingService.js';
+export { default as ServiceLog } from './ServiceLog.js';
+export { default as Payment } from './Payment.js';
+export { default as Payer } from './Payer.js';
 
 // ---------- USERS ----------
 const UserSchema = new Schema({
@@ -97,7 +101,7 @@ export const Staff = model('Staff', new Schema({
 
 
 
-// ---------- RESIDENTS ----------
+
 // ---------- RESIDENTS ----------
 export const Resident = model('Resident', new Schema({
 
@@ -124,6 +128,11 @@ export const Resident = model('Resident', new Schema({
     type: Date,
     required: true
   },
+
+  payer: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Payer',
+},
 
   gender: String,
   pronouns: String,

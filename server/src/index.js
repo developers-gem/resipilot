@@ -22,6 +22,11 @@ import facilityAuthRoutes from './routes/facilityAuth.js';
 import facilityRoutes from './routes/facilities.js';
 import billingRoutes from './routes/billing.js';
 import billingResidentsRoutes from './routes/billingResidents.js';
+import billingServicesRoutes from './routes/billingServices.js';
+import billingServiceLogsRoutes from './routes/billingServiceLogs.js';
+import payerRoutes from './routes/payers.js';
+import billingInvoicesRoutes from './routes/billingInvoices.js';
+
 const app = express();
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*' }));
@@ -56,6 +61,20 @@ app.use(
 
 app.use('/api/facilities', facilityRoutes);
 
+app.use(
+  '/api/billing/services',
+  billingServicesRoutes
+);
+app.use(
+  '/api/billing/service-logs',
+  billingServiceLogsRoutes
+);
+app.use(
+  '/api/billing/invoices',
+  billingInvoicesRoutes
+);
+
+app.use('/api/billing/payers', payerRoutes);
 
 
 // Auto-generate CRUD routes for every model
