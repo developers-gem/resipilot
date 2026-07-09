@@ -70,7 +70,8 @@ import BillingDashboard from './pages/billing/Dashboard.jsx';
 import BillingServices from './pages/billing/Services.jsx';
 import ServiceLogs from './pages/billing/ServiceLogs.jsx';
 import BillingInvoices from './pages/billing/Invoices.jsx';
-
+import BillingPayments from './pages/billing/Payments.jsx';
+import BillingPayers from './pages/billing/Payers.jsx';
 
 function SuperAdminProtected({ children }) {
   const { admin, loading } = useSuperAdminAuth();
@@ -133,6 +134,14 @@ createRoot(document.getElementById('root')).render(
                 <Route
   path="billing/invoices"
   element={<BillingInvoices />}
+/>
+<Route
+  path="billing/payments"
+  element={<BillingPayments />}
+/>
+<Route
+  path="billing/payers"
+  element={<BillingPayers />}
 />
 
                 <Route index element={<Dashboard />} />

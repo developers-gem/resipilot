@@ -66,17 +66,17 @@ export const NAV = [
       icon: 'ti-file-invoice',
     },
 
-    // {
-    //   to: '/billing/payments',
-    //   label: 'Payments',
-    //   icon: 'ti-cash',
-    // },
+    {
+      to: '/billing/payments',
+      label: 'Payments',
+      icon: 'ti-cash',
+    },
 
-    // {
-    //   to: '/billing/payers',
-    //   label: 'Payers',
-    //   icon: 'ti-building-bank',
-    // },
+    {
+      to: '/billing/payers',
+      label: 'Payers',
+      icon: 'ti-building-bank',
+    },
   ],
 },
  {
