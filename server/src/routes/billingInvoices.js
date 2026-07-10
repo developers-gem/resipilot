@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { Invoice, ServiceLog } from '../models/index.js';
 import { requireFacilityAdmin } from '../middleware/auth.js';
-
+import PDFDocument from 'pdfkit';
 const router = Router();
 
 router.use(requireFacilityAdmin);
@@ -26,6 +26,137 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Get Single Invoice
+|--------------------------------------------------------------------------
+*/
+
+router.get('/:id', async (req, res, next) => {
+  try {
+    const invoice = await Invoice.findOne({
+      _id: req.params.id,
+      facility: req.facilityAdmin.facility,
+    })
+      .populate('resident')
+      .populate('items.serviceLog');
+
+    if (!invoice) {
+      return res.status(404).json({
+        error: 'Invoice not found',
+      });
+    }
+
+    res.json(invoice);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Download Invoice PDF
+|--------------------------------------------------------------------------
+*/
+
+router.get('/:id/pdf', async (req, res, next) => {
+  try {
+    const invoice = await Invoice.findOne({
+      _id: req.params.id,
+      facility: req.facilityAdmin.facility,
+    })
+      .populate('resident')
+      .populate('items.serviceLog');
+
+    if (!invoice) {
+      return res.status(404).json({
+        error: 'Invoice not found',
+      });
+    }
+
+    res.setHeader(
+      'Content-Type',
+      'application/pdf'
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=${invoice.invoiceNumber}.pdf`
+    );
+
+    const doc = new PDFDocument({
+      margin: 50,
+    });
+
+    doc.pipe(res);
+
+    // Title
+    doc
+      .fontSize(22)
+      .text('Habitat Pilot', {
+        align: 'center',
+      });
+
+    doc.moveDown();
+
+    doc
+      .fontSize(18)
+      .text(
+        `Invoice # ${invoice.invoiceNumber}`
+      );
+
+    doc.moveDown();
+
+    doc
+      .fontSize(12)
+      .text(
+        `Resident : ${invoice.resident?.firstName || ''} ${invoice.resident?.lastName || ''}`
+      );
+
+    doc.text(
+      `Status : ${invoice.status}`
+    );
+
+    doc.text(
+      `Due Date : ${new Date(
+        invoice.dueDate
+      ).toLocaleDateString()}`
+    );
+
+    doc.moveDown();
+
+    doc
+      .fontSize(14)
+      .text('Services');
+
+    doc.moveDown(0.5);
+
+    invoice.items.forEach(item => {
+      doc.text(
+        `${item.serviceName}     ${item.units} × $${item.rate} = $${item.amount}`
+      );
+    });
+
+    doc.moveDown();
+
+    doc
+      .fontSize(16)
+      .text(
+        `Total : $${invoice.total}`,
+        {
+          align: 'right',
+        }
+      );
+
+    doc.end();
+  } catch (err) {
+    next(err);
+  }
+});
 /*
 |--------------------------------------------------------------------------
 | Generate Invoice
@@ -34,72 +165,71 @@ router.get('/', async (req, res, next) => {
 
 router.post('/generate', async (req, res, next) => {
   try {
-    const {
-      resident,
-      fromDate,
-      toDate,
-    } = req.body;
+    const { serviceLogId } = req.body;
 
-    const logs = await ServiceLog.find({
+    const log = await ServiceLog.findOne({
+      _id: serviceLogId,
       facility: req.facilityAdmin.facility,
-      resident,
-      status: 'Pending',
-      serviceDate: {
-        $gte: new Date(fromDate),
-        $lte: new Date(toDate),
-      },
-    });
+    })
+      .populate('resident')
+      .populate('service');
 
-    if (!logs.length) {
-      return res.status(400).json({
-        error: 'No pending service logs found.',
+    if (!log) {
+      return res.status(404).json({
+        error: 'Service log not found.',
       });
     }
 
-    const subtotal = logs.reduce(
-      (sum, l) => sum + l.amount,
-      0
-    );
+    if (log.status === 'Billed') {
+      return res.status(400).json({
+        error: 'Invoice already generated.',
+      });
+    }
 
     const invoice = await Invoice.create({
       facility: req.facilityAdmin.facility,
 
-      resident,
+      resident: log.resident._id,
 
-      invoiceNumber:
-        'INV-' + Date.now(),
+      invoiceNumber: 'INV-' + Date.now(),
 
-      items: logs.map(log => ({
-        serviceLog: log._id,
-        serviceName: log.serviceName,
-        units: log.units,
-        rate: log.rate,
-        amount: log.amount,
-      })),
+      items: [
+        {
+          serviceLog: log._id,
 
-      subtotal,
+          serviceName:
+            log.service?.name || log.serviceName,
 
-      total: subtotal,
+          units: log.units,
 
-      dueDate: new Date(),
+          rate: log.rate,
+
+          amount: log.amount,
+        },
+      ],
+
+      subtotal: log.amount,
+
+      total: log.amount,
+
+      balance: log.amount,
+
+      status: 'Draft',
+
+      dueDate: new Date(
+        Date.now() + 15 * 24 * 60 * 60 * 1000
+      ),
     });
 
-    await ServiceLog.updateMany(
-      {
-        _id: {
-          $in: logs.map(l => l._id),
-        },
-      },
-      {
-        status: 'Billed',
-        invoice: invoice._id,
-      }
-    );
+    log.status = 'Billed';
+
+    log.invoice = invoice._id;
+
+    await log.save();
 
     res.status(201).json(invoice);
   } catch (err) {
     next(err);
   }
 });
-
 export default router;

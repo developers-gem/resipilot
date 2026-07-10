@@ -7,6 +7,7 @@ import { requireAuth } from '../middleware/auth.js';
 // POST /       -> create
 // PATCH /:id   -> update
 // DELETE /:id  -> delete
+
 export function crudRouter(Model) {
   const r = Router();
   r.use(requireAuth);

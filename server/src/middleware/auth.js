@@ -6,6 +6,7 @@ import SuperAdmin from '../models/SuperAdmin.js';
 import FacilityAdmin from '../models/FacilityAdmin.js';
 
 
+
 export async function requireAuth(req, res, next) {
   try {
     const header = req.headers.authorization || '';
@@ -133,14 +134,15 @@ export async function requireFacilityAdmin(
   res,
   next
 ) {
-  try {
+   try {
+    console.log('AUTH HEADER:', req.headers.authorization);
+
     const auth = req.headers.authorization;
 
     if (!auth?.startsWith('Bearer ')) {
-      return res
-        .status(401)
-        .json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized' });
     }
+
 
     const token = auth.split(' ')[1];
 
