@@ -17,7 +17,8 @@ export default function ServiceLogs() {
   const [services, setServices] = useState([]);
 
   const [show, setShow] = useState(false);
-
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [invoice, setInvoice] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
@@ -48,6 +49,82 @@ export default function ServiceLogs() {
     load();
   }
 
+
+
+  async function generateInvoice(log) {
+    try {
+      await facilityApi.post(
+        '/billing/invoices/generate',
+        {
+          resident: log.resident._id,
+          serviceLogId: log._id,
+        }
+      );
+
+      load();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+  async function downloadInvoice(id) {
+  try {
+    const blob = await facilityApi.download(
+      `/billing/invoices/${id}/pdf`
+    );
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Invoice-${id}.pdf`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  }
+}
+  async function viewInvoice(invoiceId) {
+    try {
+      const data = await facilityApi.get(
+        '/billing/invoices/' + invoiceId
+      );
+
+      setInvoice(data);
+
+      setShowInvoice(true);
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+
+
+  async function downloadInvoice(id) {
+  try {
+    const blob = await facilityApi.download(
+      `/billing/invoices/${id}/pdf`
+    );
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Invoice-${id}.pdf`;
+
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
   return (
     <>
       <PageHeader
@@ -74,6 +151,7 @@ export default function ServiceLogs() {
               <th>Rate</th>
               <th>Amount</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
@@ -81,7 +159,7 @@ export default function ServiceLogs() {
             {logs.length === 0 && (
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="8"
                   style={{
                     textAlign: 'center',
                     padding: 30,
@@ -95,34 +173,64 @@ export default function ServiceLogs() {
             {logs.map(log => (
               <tr key={log._id}>
                 <td>
-                  {new Date(
-                    log.serviceDate
-                  ).toLocaleDateString()}
+                  {new Date(log.serviceDate).toLocaleDateString()}
                 </td>
 
                 <td>
-                  {log.resident?.firstName}{' '}
-                  {log.resident?.lastName}
+                  {log.resident?.firstName} {log.resident?.lastName}
                 </td>
 
                 <td>{log.serviceName}</td>
 
                 <td>{log.units}</td>
 
-                <td>${log.rate}</td>
+                <td>${Number(log.rate || 0).toFixed(2)}</td>
 
-                <td>${log.amount}</td>
+                <td>${Number(log.amount || 0).toFixed(2)}</td>
 
                 <td>
-                  <span
-                    className={`badge ${
-                      log.status === 'Billed'
-                        ? 'blue'
-                        : 'green'
-                    }`}
-                  >
-                    {log.status}
-                  </span>
+                  <select>
+  <option>Draft</option>
+  <option>Pending</option>
+  <option>Paid</option>
+  <option>Cancelled</option>
+</select>
+                </td>
+
+                <td
+                  style={{
+                    display: 'flex',
+                    gap: 8,
+                  }}
+                >
+                  {log.status !== 'Billed' ? (
+                    <button
+                      className="btn primary sm"
+                      onClick={() => generateInvoice(log)}
+                    >
+                      <i className="ti ti-file-invoice" />
+                      Generate Invoice
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className="btn sm"
+                        onClick={() =>
+                          viewInvoice(log.invoice)
+                        }
+                      >
+                        View
+                      </button>
+
+                      <button
+                        className="btn success sm"
+                        onClick={() => downloadInvoice(log.invoice)}
+                      >
+                        <i className="ti ti-download" />
+                        Download
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ))}
@@ -256,6 +364,90 @@ export default function ServiceLogs() {
               }
             />
           </Field>
+        </Modal>
+      )}
+
+
+
+      {showInvoice && invoice && (
+        <Modal
+          title={`Invoice ${invoice.invoiceNumber}`}
+          onClose={() => {
+            setShowInvoice(false);
+            setInvoice(null);
+          }}
+          footer={
+            <button
+              className="btn"
+              onClick={() => {
+                setShowInvoice(false);
+                setInvoice(null);
+              }}
+            >
+              Close
+            </button>
+          }
+        >
+          <div className="grid cols-2">
+            <Field label="Invoice">
+              <div>{invoice.invoiceNumber}</div>
+            </Field>
+
+            <Field label="Resident">
+              <div>
+                {invoice.resident?.firstName}{' '}
+                {invoice.resident?.lastName}
+              </div>
+            </Field>
+
+            <Field label="Status">
+              <div>{invoice.status}</div>
+            </Field>
+
+            <Field label="Due Date">
+              <div>
+                {new Date(
+                  invoice.dueDate
+                ).toLocaleDateString()}
+              </div>
+            </Field>
+          </div>
+
+          <table style={{ marginTop: 20 }}>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Units</th>
+                <th>Rate</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {invoice.items.map((item, i) => (
+                <tr key={i}>
+                  <td>{item.serviceName}</td>
+
+                  <td>{item.units}</td>
+
+                  <td>${item.rate}</td>
+
+                  <td>${item.amount}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div
+            style={{
+              marginTop: 20,
+              textAlign: 'right',
+              fontWeight: 700,
+              fontSize: 18,
+            }}
+          >
+            Total : ${invoice.total}
+          </div>
         </Modal>
       )}
     </>

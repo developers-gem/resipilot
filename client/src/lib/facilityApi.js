@@ -59,4 +59,31 @@ export const facilityApi = {
   patch: (p, b) => request('PATCH', p, b),
   delete: p => request('DELETE', p),
   upload,
+    download,
+
 };
+
+async function download(path) {
+  const token = localStorage.getItem('facilityToken');
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: 'GET',
+    headers: {
+      ...(token
+        ? {
+            Authorization: `Bearer ${token}`,
+          }
+        : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({
+      error: res.statusText,
+    }));
+
+    throw new Error(err.error || 'Download failed');
+  }
+
+  return res.blob();
+}

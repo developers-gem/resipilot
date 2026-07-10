@@ -56,15 +56,15 @@ export const NAV = [
 
     {
       to: '/billing/service-logs',
-      label: 'Service Logs',
+      label: 'Invoice & Service Logs',
       icon: 'ti-clipboard-list',
     },
 
-    {
-      to: '/billing/invoices',
-      label: 'Invoices',
-      icon: 'ti-file-invoice',
-    },
+    // {
+    //   to: '/billing/invoices',
+    //   label: 'Invoices',
+    //   icon: 'ti-file-invoice',
+    // },
 
     {
       to: '/billing/payments',
